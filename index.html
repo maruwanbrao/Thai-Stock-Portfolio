@@ -76,11 +76,11 @@ code{font-family:var(--mono);font-size:11px;background:var(--ink);padding:2px 5p
 
 /* KPI */
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:14px 15px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden;min-width:0}
+.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:14px 15px;transition:border-color .2s,transform .2s;position:relative;min-width:0}
 .kpi:hover{border-color:var(--rim2);transform:translateY(-2px)}
-.kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.015),transparent);pointer-events:none}
-.kl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kv{font-size:18px;font-weight:800;font-family:var(--mono);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.015),transparent);pointer-events:none;border-radius:var(--rad)}
+.kl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600}
+.kv{font-size:18px;font-weight:800;font-family:var(--mono);line-height:1.2}
 .ks{font-size:11px;margin-top:5px;color:var(--txt3)}
 .k-b{border-color:rgba(59,130,246,.3);background:linear-gradient(135deg,var(--card),rgba(59,130,246,.05))}
 .k-g{border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,var(--card),rgba(16,185,129,.05))}
@@ -194,11 +194,10 @@ select option{background:var(--ink2)}
 
 @media(max-width:600px){
   .wrap{padding:11px}
-  /* KPI: 2 คอลัมน์บนมือถือ ตัวเลขไม่ wrap */
   .kgrid{grid-template-columns:repeat(2,1fr);gap:8px}
-  .kpi{padding:11px 12px}
-  .kl{font-size:9.5px;letter-spacing:.6px}
-  .kv{font-size:16px}
+  .kpi{padding:12px 13px}
+  .kl{font-size:9px;letter-spacing:.5px}
+  .kv{font-size:15px}
   .ks{font-size:10px}
   .sgrid{grid-template-columns:1fr}
   .fr{grid-template-columns:1fr}
@@ -206,10 +205,9 @@ select option{background:var(--ink2)}
   .logo{font-size:14px}
   .nb{padding:10px 12px;font-size:12px}
 }
-/* จอเล็กมาก < 380px: ลด font เพิ่มอีกนิด */
 @media(max-width:380px){
-  .kv{font-size:14px}
-  .kl{font-size:9px}
+  .kv{font-size:13px}
+  .kl{font-size:8.5px}
   .kpi{padding:10px 10px}
 }
 @media(min-width:900px){.kgrid{grid-template-columns:repeat(6,1fr)}}
@@ -309,7 +307,7 @@ select option{background:var(--ink2)}
         <div class="sec" style="margin:0">ประวัติโอนเงิน DCA</div>
         <button class="btn btn-b" onclick="openM('mEq')" style="font-size:12.5px;padding:8px 15px">+ เพิ่ม</button>
       </div>
-      <div class="kgrid" style="max-width:420px">
+      <div class="kgrid" style="max-width:500px">
         <div class="kpi k-b"><div class="kl">รวมทั้งหมด</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
         <div class="kpi"><div class="kl">จำนวนครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
       </div>
@@ -322,7 +320,7 @@ select option{background:var(--ink2)}
         <div class="sec" style="margin:0">เงินปันผล</div>
         <button class="btn btn-b" onclick="openM('mDiv')" style="font-size:12.5px;padding:8px 15px">+ บันทึก</button>
       </div>
-      <div class="kgrid" style="max-width:420px">
+      <div class="kgrid" style="max-width:500px">
         <div class="kpi k-y"><div class="kl">รวมทั้งหมด</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
         <div class="kpi k-g"><div class="kl">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
       </div>
