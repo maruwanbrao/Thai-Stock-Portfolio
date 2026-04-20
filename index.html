@@ -534,7 +534,7 @@ function renderDash(){
   set('k-pv',fB(t.val)); set('k-dv',fB(t.div));
   set('k-tt',fB(t.pnl+t.div)); set('k-cn',D.stocks.length+'');
 
-  set('sumTbl', Object.values(h).map(x=>{
+  set('sumTbl', Object.values(h).filter(x=>x.volume>0).map(x=>{
     const g=x.pnl>=0;
     return `<tr>
       <td><b style="color:${x.color||'var(--sky)'}">${x.symbol}</b></td>
@@ -545,8 +545,8 @@ function renderDash(){
     </tr>`;
   }).join(''));
 
-  const tv=Object.values(h).reduce((s,x)=>s+x.mv,0);
-  set('allocL', Object.values(h).map(x=>{
+  const tv=Object.values(h).filter(x=>x.volume>0).reduce((s,x)=>s+x.mv,0);
+  set('allocL', Object.values(h).filter(x=>x.volume>0).map(x=>{
     const p=tv>0?x.mv/tv*100:0;
     return `<div class="alloc-item">
       <div class="ai-inf"><span style="color:${x.color||'var(--sky)'};font-weight:700">${x.symbol}</span>
@@ -566,15 +566,28 @@ function renderDash(){
 
 function renderPort(){
   const h=hld();
-  set('stockGrid', Object.values(h).map(x=>{
+  // แสดงเฉพาะหุ้นที่ยังถืออยู่ (volume > 0)
+  const active = Object.values(h).filter(x => x.volume > 0);
+  set('stockGrid', active.map(x=>{
     const g=x.pnl>=0, cc=x.cpct>0?'up':x.cpct<0?'dn':'fl', bw=Math.min(Math.abs(x.pct)*2,100);
+    const p=D.prices[x.symbol]||{};
+    const hi=+(p.high||0), lo=+(p.low||0), vol=+(p.volume||0);
+    const upAt=p.updatedAt ? p.updatedAt.replace('T',' ').substr(0,16) : '–';
     return `<div class="sc">
       <div class="sc-hd">
-        <div><div class="sym" style="color:${x.color||'var(--sky)'}">${x.symbol}</div><div class="snm">${x.name||''}</div></div>
-        <div class="pb"><div class="mp" style="color:${x.color||'var(--sky)'}">${fB(x.mp)}</div>
-        <div class="cp ${cc}">${x.cpct>=0?'▲':'▼'} ${f(Math.abs(x.cpct))}%</div></div>
+        <div>
+          <div class="sym" style="color:${x.color||'var(--sky)'}">${x.symbol}</div>
+          <div class="snm">${x.name||''}</div>
+          <div style="font-size:10px;color:var(--txt3);margin-top:3px;font-family:var(--mono)">🕐 ${upAt}</div>
+        </div>
+        <div class="pb">
+          <div class="mp" style="color:${x.color||'var(--sky)'}">${fB(x.mp)}</div>
+          <div class="cp ${cc}">${x.cpct>=0?'▲':'▼'} ${f(Math.abs(x.cpct))}% &nbsp;${x.chg>=0?'+':''}${f(x.chg,2)}</div>
+        </div>
       </div>
       <div class="sc-bd">
+        <div class="sr"><span class="sl">สูง/ต่ำ วันนี้</span><span class="sv" style="font-size:11px"><span style="color:var(--jade)">${hi>0?fB(hi):'–'}</span> / <span style="color:var(--rose)">${lo>0?fB(lo):'–'}</span></span></div>
+        <div class="sr"><span class="sl">ปริมาณ</span><span class="sv" style="font-size:11px">${vol>0?f(vol,0)+' หุ้น':'–'}</span></div>
         <div class="sr"><span class="sl">ถือ</span><span class="sv">${f(x.volume,0)} หุ้น</span></div>
         <div class="sr"><span class="sl">ราคาเฉลี่ย</span><span class="sv">${fB(x.avg,3)}</span></div>
         <div class="sr"><span class="sl">มูลค่า</span><span class="sv">${fB(x.mv)}</span></div>
@@ -634,12 +647,22 @@ function renderDiv(){
 
 function renderCfg(){
   document.getElementById('cfgUrl').value=URL;
-  set('priceIn', D.stocks.map(s=>{
+  set('priceIn', `
+    <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-b" onclick="triggerFetchPrices()" style="font-size:12.5px;padding:8px 14px">
+        🔄 ดึงราคาจาก Yahoo Finance ทันที
+      </button>
+      <span style="font-size:11.5px;color:var(--txt3)">หรืออัพเดทราคาด้วยตนเอง:</span>
+    </div>
+    `+D.stocks.map(s=>{
     const p=D.prices[s.symbol]||{};
-    return `<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+    const upAt = p.updatedAt ? p.updatedAt.replace('T',' ').substr(0,16) : '–';
+    return `<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
       <span style="font-family:var(--mono);font-weight:700;color:${s.color||'var(--sky)'};min-width:55px;font-size:13px">${s.symbol}</span>
-      <input type="number" step="0.01" value="${p.price||''}" placeholder="ราคา" id="pi-${s.symbol}" style="width:95px;padding:6px 9px;font-size:12px">
+      <span style="font-family:var(--mono);font-size:13px;color:${+(p.changePct||0)>=0?'var(--jade)':'var(--rose)'};min-width:55px">${p.price?fB(+p.price):'–'}</span>
+      <input type="number" step="0.01" value="${p.price||''}" placeholder="ราคา" id="pi-${s.symbol}" style="width:90px;padding:6px 9px;font-size:12px">
       <button class="bs" onclick="savePrice('${s.symbol}')">บันทึก</button>
+      <span style="font-size:10px;color:var(--txt3);font-family:var(--mono)">อัพเดท: ${upAt}</span>
     </div>`;
   }).join(''));
 }
@@ -724,6 +747,16 @@ async function savePrice(sym){
   catch(e){toast('❌ '+e.message);}finally{unload();}
 }
 
+// ดึงราคาจาก Yahoo Finance ผ่าน Apps Script ทันที
+async function triggerFetchPrices() {
+  load('🔄 กำลังดึงราคาจาก Yahoo Finance...');
+  try {
+    await api('fetchPrices', {});
+    await refreshAll();
+    toast('✅ อัพเดทราคาสำเร็จ');
+  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+}
+
 function saveUrl(){const u=document.getElementById('cfgUrl').value.trim();localStorage.setItem(LS_URL,u);URL=u;toast('✅ บันทึก URL สำเร็จ');refreshAll();}
 function clearCache(){if(!confirm('ล้าง cache ใน browser?'))return;localStorage.removeItem(LS_CACHE);D={stocks:[],transactions:[],equity:[],dividends:[],prices:{}};renderAll();toast('✅ ล้าง cache แล้ว — กด Sync ↻');}
 
@@ -802,21 +835,26 @@ async function analyzeOne(sym,name,wrap){
 // ═══════════ SEED DATA ═══════════
 function buildSeed(){
   const u=()=>Math.random().toString(36).substr(2,9);
+  // ไม่มี AIT ในพอร์ตแล้ว — 4 ตัวเท่านั้น
   const stocks=[
     {id:u(),symbol:'UPOIC',name:'Union Pioneer Oil International',color:'#3b82f6'},
     {id:u(),symbol:'SC',name:'SC Asset Corporation',color:'#10b981'},
     {id:u(),symbol:'SIRI',name:'Sansiri Public Company',color:'#f59e0b'},
     {id:u(),symbol:'SCAP',name:'Seamico Capital',color:'#8b5cf6'},
-    {id:u(),symbol:'AIT',name:'Advanced Info Tech',color:'#ef4444'},
   ];
-  const prices={UPOIC:{price:7.60,change:0.50,changePct:7.04},SC:{price:1.97,change:-0.02,changePct:-1.01},SIRI:{price:1.41,change:-0.03,changePct:-2.08},SCAP:{price:1.07,change:0,changePct:0},AIT:{price:4.88,change:0,changePct:0}};
+  const prices={UPOIC:{price:7.60,change:0.50,changePct:7.04},SC:{price:1.97,change:-0.02,changePct:-1.01},SIRI:{price:1.41,change:-0.03,changePct:-2.08},SCAP:{price:1.07,change:0,changePct:0}};
   const T=(d,s,tp,v,p,n='DCA')=>({id:u(),date:d,symbol:s,type:tp,volume:v,price:p,fee:0,note:n});
   const transactions=[
     T('2025-02-25','UPOIC','Buy',31200,6.468,'Initial'),T('2025-03-03','UPOIC','Buy',100,6.8113),T('2025-03-04','UPOIC','Buy',100,6.8113),T('2025-03-31','UPOIC','Buy',400,6.31065),T('2026-02-13','UPOIC','Buy',100,6.8114),T('2026-02-17','UPOIC','Buy',100,6.6612),T('2026-02-20','UPOIC','Buy',100,6.7112),
     T('2025-02-25','SC','Buy',13800,3.463,'Initial'),T('2025-03-03','SC','Buy',100,2.5043),T('2025-03-03','SC','Buy',100,2.5243),T('2025-03-03','SC','Buy',200,2.5443),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.4841),T('2025-03-06','SC','Buy',100,2.5243),T('2025-03-06','SC','Buy',100,2.5243),T('2025-03-30','SC','Buy',400,2.404),T('2026-02-13','SC','Buy',200,1.9032),T('2026-02-13','SC','Buy',100,1.8931),T('2026-02-13','SC','Buy',100,1.8831),T('2026-02-13','SC','Buy',100,1.8731),T('2026-02-17','SC','Buy',100,1.9432),T('2026-02-18','SC','Buy',100,2.0633),T('2026-02-20','SC','Buy',200,2.0434),
     T('2025-02-25','SIRI','Buy',11200,1.7514,'Initial'),T('2025-03-03','SIRI','Buy',100,1.6728),T('2025-03-03','SIRI','Buy',300,1.6828),T('2025-03-04','SIRI','Buy',100,1.6828),T('2025-03-06','SIRI','Buy',100,1.6928),T('2025-03-06','SIRI','Buy',100,1.6928),T('2025-03-30','SIRI','Buy',300,1.4525),T('2025-03-30','SIRI','Buy',100,1.4425),T('2026-02-09','SIRI','Buy',100,1.4224),T('2026-02-09','SIRI','Buy',100,1.4124),T('2026-02-10','SIRI','Buy',100,1.4224),T('2026-02-13','SIRI','Buy',200,1.4625),T('2026-02-13','SIRI','Buy',100,1.4525),T('2026-02-18','SIRI','Buy',100,1.5226),T('2026-02-18','SIRI','Buy',100,1.5127),T('2026-02-20','SIRI','Buy',100,1.5626),T('2026-02-23','SIRI','Buy',100,1.5727),
     T('2025-01-24','SCAP','Buy',16,2.28375,'Initial'),
-    T('2024-02-25','AIT','Buy',1500,4.2899,'Initial'),T('2025-03-04','AIT','Buy',100,4.5076),T('2025-03-04','AIT','Buy',100,4.4875),T('2025-03-30','AIT','Buy',400,4.6077),
+    // AIT — เก็บประวัติ + Sell หมด → volume net = 0 ไม่แสดงในพอร์ต
+    T('2024-02-25','AIT','Buy', 1500,4.2899,'Historical'),
+    T('2025-03-04','AIT','Buy', 100, 4.5076,'Historical'),
+    T('2025-03-04','AIT','Buy', 100, 4.4875,'Historical'),
+    T('2025-03-30','AIT','Buy', 400, 4.6077,'Historical'),
+    T('2026-04-20','AIT','Sell',2100,4.88,  'ขายหมด'),
   ];
   const E=(d,a,n='DCA')=>({id:u(),date:d,amount:a,note:n});
   const equity=[E('2018-03-02',1000),E('2018-03-28',1000),E('2018-04-17',500),E('2018-05-03',900),E('2018-05-10',1300),E('2018-05-17',500),E('2018-05-28',1000),E('2018-06-05',800),E('2018-06-27',1000),E('2018-06-29',800),E('2018-07-26',1000),E('2018-08-29',1000),E('2018-09-11',600),E('2018-09-12',1000),E('2018-09-28',1000),E('2018-10-05',500),E('2018-10-25',1000),E('2018-11-28',1000),E('2018-12-24',100),E('2018-12-28',1000),E('2019-01-11',600),E('2019-01-28',1000),E('2019-01-30',500),E('2019-02-28',1000),E('2019-03-01',1000),E('2019-03-28',1000),E('2019-04-26',1000),E('2019-05-28',1000),E('2019-06-28',1000),E('2019-07-26',1000),E('2019-08-28',1000),E('2019-09-27',1000),E('2019-10-28',1000),E('2019-11-19',1000),E('2019-11-28',2000),E('2019-12-27',2000),E('2020-01-22',1000),E('2020-01-28',2000),E('2020-02-28',2000),E('2020-03-27',2000),E('2020-04-28',2000),E('2020-05-28',2000),E('2020-06-25',2000),E('2020-07-24',2000),E('2020-08-28',2000),E('2020-09-28',2000),E('2020-10-28',2000),E('2020-11-27',2000),E('2020-12-28',2000),E('2021-01-28',2000),E('2021-02-25',2000),E('2021-03-26',2000),E('2021-04-28',2000),E('2021-05-28',2000),E('2021-06-28',2000),E('2021-07-27',3000),E('2021-08-27',3000),E('2021-09-28',3000),E('2021-10-28',3000),E('2021-11-26',3000),E('2021-12-28',3000),E('2022-01-31',3000),E('2022-02-28',3000),E('2022-03-28',3000),E('2022-04-28',3000),E('2022-05-27',3000),E('2022-06-28',3000),E('2022-07-27',3000),E('2022-08-26',3000),E('2022-09-28',3000),E('2022-10-28',3000),E('2022-11-28',3000),E('2022-12-28',3000),E('2023-01-27',3000),E('2023-02-28',3000),E('2023-03-28',3000),E('2023-04-28',3000),E('2023-05-03',7000),E('2023-05-28',4000),E('2023-06-30',4000),E('2023-07-29',4000),E('2023-08-31',4000),E('2023-09-29',4000),E('2023-10-30',4000),E('2023-11-29',4000),E('2023-12-27',4000),E('2024-01-29',4000),E('2024-02-28',4000),E('2024-03-28',4000),E('2024-04-30',5000),E('2024-05-23',8791.4),E('2024-05-31',5000),E('2024-07-01',5000),E('2024-07-30',5000),E('2024-08-28',5000),E('2024-09-30',5000),E('2024-11-01',5000),E('2024-12-02',5000),E('2025-01-02',6000),E('2025-02-03',6000),E('2025-03-03',6000),E('2026-01-09',5000)];
@@ -836,9 +874,17 @@ window.addEventListener('load',()=>{
     if(URL){
       document.getElementById('setupScreen').style.display='none';
       document.getElementById('app').classList.add('on');
-      renderAll();      // render from cache instantly
-      refreshAll();     // then sync from Sheets
-      setInterval(refreshAll, 120000); // auto-sync every 2 min
+      renderAll();       // render cache ทันที
+      refreshAll();      // sync จาก Sheets
+      // auto-sync ข้อมูลทุก 2 นาที
+      setInterval(refreshAll, 120000);
+      // auto-fetch ราคาจาก Yahoo Finance ทุก 15 นาที (ผ่าน Apps Script)
+      setInterval(async ()=>{
+        try {
+          await api('fetchPrices',{});
+          await refreshAll();
+        } catch(e){ /* silent fail */ }
+      }, 900000); // 15 นาที
     }
   };
   document.head.appendChild(s);
