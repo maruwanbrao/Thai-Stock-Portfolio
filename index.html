@@ -75,12 +75,12 @@ code{font-family:var(--mono);font-size:11px;background:var(--ink);padding:2px 5p
 .pg.on{display:block}
 
 /* KPI */
-.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:13px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:15px 17px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden;min-width:0}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:14px 15px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden;min-width:0}
 .kpi:hover{border-color:var(--rim2);transform:translateY(-2px)}
 .kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.015),transparent);pointer-events:none}
-.kl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kv{font-size:clamp(15px,2.2vw,20px);font-weight:800;font-family:var(--mono);line-height:1;word-break:break-all}
+.kl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kv{font-size:18px;font-weight:800;font-family:var(--mono);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ks{font-size:11px;margin-top:5px;color:var(--txt3)}
 .k-b{border-color:rgba(59,130,246,.3);background:linear-gradient(135deg,var(--card),rgba(59,130,246,.05))}
 .k-g{border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,var(--card),rgba(16,185,129,.05))}
@@ -194,14 +194,23 @@ select option{background:var(--ink2)}
 
 @media(max-width:600px){
   .wrap{padding:11px}
-  .kgrid{grid-template-columns:repeat(2,1fr);gap:9px}
-  .kpi{padding:12px}
-  .kv{font-size:17px}
+  /* KPI: 2 คอลัมน์บนมือถือ ตัวเลขไม่ wrap */
+  .kgrid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kpi{padding:11px 12px}
+  .kl{font-size:9.5px;letter-spacing:.6px}
+  .kv{font-size:16px}
+  .ks{font-size:10px}
   .sgrid{grid-template-columns:1fr}
   .fr{grid-template-columns:1fr}
   .hdr{padding:0 11px}
   .logo{font-size:14px}
   .nb{padding:10px 12px;font-size:12px}
+}
+/* จอเล็กมาก < 380px: ลด font เพิ่มอีกนิด */
+@media(max-width:380px){
+  .kv{font-size:14px}
+  .kl{font-size:9px}
+  .kpi{padding:10px 10px}
 }
 @media(min-width:900px){.kgrid{grid-template-columns:repeat(6,1fr)}}
 </style>
@@ -300,9 +309,9 @@ select option{background:var(--ink2)}
         <div class="sec" style="margin:0">ประวัติโอนเงิน DCA</div>
         <button class="btn btn-b" onclick="openM('mEq')" style="font-size:12.5px;padding:8px 15px">+ เพิ่ม</button>
       </div>
-      <div class="kgrid" style="max-width:380px">
-        <div class="kpi k-b"><div class="kl">รวม</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
-        <div class="kpi"><div class="kl">ครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
+      <div class="kgrid" style="max-width:420px">
+        <div class="kpi k-b"><div class="kl">รวมทั้งหมด</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
+        <div class="kpi"><div class="kl">จำนวนครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
       </div>
       <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="eqTbl"></tbody></table></div>
     </div>
@@ -313,7 +322,7 @@ select option{background:var(--ink2)}
         <div class="sec" style="margin:0">เงินปันผล</div>
         <button class="btn btn-b" onclick="openM('mDiv')" style="font-size:12.5px;padding:8px 15px">+ บันทึก</button>
       </div>
-      <div class="kgrid" style="max-width:380px">
+      <div class="kgrid" style="max-width:420px">
         <div class="kpi k-y"><div class="kl">รวมทั้งหมด</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
         <div class="kpi k-g"><div class="kl">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
       </div>
@@ -530,19 +539,33 @@ const f=(n,d=2)=>isNaN(+n)?'–':new Intl.NumberFormat('th-TH',{minimumFractionD
 const fB=(n,d=2)=>'฿'+f(n,d);
 const set=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h;};
 
+// ย่อตัวเลขสำหรับ KPI card — ป้องกัน overflow บนมือถือ
+// ฿259,891 → ฿259.9K  |  ฿1,234,567 → ฿1.2M
+function fK(n) {
+  const v = +n;
+  if (isNaN(v)) return '–';
+  if (Math.abs(v) >= 1000000) return '฿' + (v/1000000).toFixed(1) + 'M';
+  if (Math.abs(v) >= 10000)   return '฿' + (v/1000).toFixed(1) + 'K';
+  return fB(v);
+}
+
 // ═══════════ RENDER ═══════════
 let eqCI=null;
 function renderAll(){renderDash();renderPort();renderTxs();renderEq();renderDiv();renderCfg();fillSelects();}
 
 function renderDash(){
   const t=totals(), h=hld(), g=t.pnl>=0;
-  set('k-eq',fB(t.eq)); set('k-eq-s',`DCA ${D.equity.length} ครั้ง`);
-  const pe=document.getElementById('k-pnl');
-  pe.textContent=(g?'+':'')+fB(t.pnl); pe.style.color=g?'var(--jade)':'var(--rose)';
+  set('k-eq',  fK(t.eq)); set('k-eq-s',`DCA ${D.equity.length} ครั้ง`);
+
+  const pnlEl=document.getElementById('k-pnl');
+  pnlEl.textContent=(g?'+':'')+fK(t.pnl); pnlEl.style.color=g?'var(--jade)':'var(--rose)';
   document.getElementById('k-pc').className=`kpi ${g?'k-g':'k-r'}`;
   set('k-pp',`<span style="color:${g?'var(--jade)':'var(--rose)'}">${g?'▲':'▼'} ${f(Math.abs(t.pp))}%</span>`);
-  set('k-pv',fB(t.val)); set('k-dv',fB(t.div));
-  set('k-tt',fB(t.pnl+t.div)); set('k-cn',D.stocks.length+'');
+
+  set('k-pv', fK(t.val));
+  set('k-dv', fK(t.div));
+  set('k-tt', fK(t.pnl+t.div));
+  set('k-cn', D.stocks.length+'');
 
   set('sumTbl', Object.values(h).filter(x=>x.volume>0).map(x=>{
     const g=x.pnl>=0;
@@ -632,7 +655,7 @@ function renderTxs(){
 function renderEq(){
   const s=[...D.equity].sort((a,b)=>new Date(b.date)-new Date(a.date));
   const tot=s.reduce((x,e)=>x+(+e.amount),0);
-  set('eqTot',fB(tot)); set('eqCnt',s.length+'');
+  set('eqTot',fK(tot)); set('eqCnt',s.length+'');
   set('eqTbl', s.map((e,i)=>`<tr>
     <td>${i+1}</td><td>${e.date}</td>
     <td style="color:var(--sky)">${fB(+e.amount)}</td>
@@ -646,7 +669,7 @@ function renderDiv(){
   const tot=s.reduce((x,d)=>x+(+d.amount),0);
   const thisYear = String(new Date().getFullYear());
   const yr=s.filter(d=>String(d.date||'').startsWith(thisYear)).reduce((x,d)=>x+(+d.amount),0);
-  set('dvTot',fB(tot)); set('dvYr',fB(yr));
+  set('dvTot',fK(tot)); set('dvYr',fK(yr));
   set('dvTbl', s.map((d,i)=>`<tr>
     <td>${i+1}</td><td>${d.date}</td>
     <td><b>${d.symbol}</b></td>
