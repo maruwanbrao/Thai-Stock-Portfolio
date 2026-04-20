@@ -76,11 +76,11 @@ code{font-family:var(--mono);font-size:11px;background:var(--ink);padding:2px 5p
 
 /* KPI */
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:13px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:15px 17px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden}
+.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:15px 17px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden;min-width:0}
 .kpi:hover{border-color:var(--rim2);transform:translateY(-2px)}
 .kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.015),transparent);pointer-events:none}
-.kl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;font-weight:600}
-.kv{font-size:20px;font-weight:800;font-family:var(--mono);line-height:1}
+.kl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kv{font-size:clamp(15px,2.2vw,20px);font-weight:800;font-family:var(--mono);line-height:1;word-break:break-all}
 .ks{font-size:11px;margin-top:5px;color:var(--txt3)}
 .k-b{border-color:rgba(59,130,246,.3);background:linear-gradient(135deg,var(--card),rgba(59,130,246,.05))}
 .k-g{border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,var(--card),rgba(16,185,129,.05))}
@@ -325,10 +325,20 @@ select option{background:var(--ink2)}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
         <div>
           <div class="sec" style="margin:0 0 4px">AI วิเคราะห์หุ้น (Claude + Web Search)</div>
-          <div style="font-size:11.5px;color:var(--txt3)">วิเคราะห์จากข้อมูลพอร์ตจริง + ข่าวสารล่าสุด อัพเดทโดย Claude AI</div>
+          <div style="font-size:11.5px;color:var(--txt3)">วิเคราะห์จากข้อมูลพอร์ตจริง + ข่าวสารล่าสุด ผ่าน Apps Script</div>
         </div>
         <button class="btn btn-b" id="aBtn" onclick="analyzeAll()">🔍 วิเคราะห์ทั้งหมด</button>
       </div>
+
+      <!-- API Key Setup Guide -->
+      <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:12.5px;color:var(--txt2);line-height:1.8">
+        <div style="font-weight:700;color:var(--amber);margin-bottom:6px">⚙️ ต้องตั้งค่า Anthropic API Key ก่อนใช้งาน (ครั้งเดียว)</div>
+        <div>1. ไปที่ <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--sky)">console.anthropic.com</a> → สร้าง API Key</div>
+        <div>2. เปิด Apps Script → <code>⚙️ Project Settings</code> → <code>Script properties</code></div>
+        <div>3. กด <code>+ Add property</code> → Key: <code>ANTHROPIC_API_KEY</code> → Value: <code>sk-ant-...</code></div>
+        <div>4. กด Save → Deploy ใหม่ → กลับมากด "วิเคราะห์ทั้งหมด"</div>
+      </div>
+
       <div id="aiCards"></div>
     </div>
 
@@ -634,7 +644,8 @@ function renderEq(){
 function renderDiv(){
   const s=[...D.dividends].sort((a,b)=>new Date(b.date)-new Date(a.date));
   const tot=s.reduce((x,d)=>x+(+d.amount),0);
-  const yr=s.filter(d=>String(d.date).startsWith(new Date().getFullYear())).reduce((x,d)=>x+(+d.amount),0);
+  const thisYear = String(new Date().getFullYear());
+  const yr=s.filter(d=>String(d.date||'').startsWith(thisYear)).reduce((x,d)=>x+(+d.amount),0);
   set('dvTot',fB(tot)); set('dvYr',fB(yr));
   set('dvTbl', s.map((d,i)=>`<tr>
     <td>${i+1}</td><td>${d.date}</td>
@@ -792,25 +803,30 @@ async function analyzeAll(){
   for(const s of D.stocks) await analyzeOne(s.symbol,s.name||'',wrap);
   btn.disabled=false;btn.textContent='🔍 วิเคราะห์ทั้งหมด';
 }
-async function analyzeOne(sym,name,wrap){
+async function analyzeOne(sym, name, wrap){
   const h=hld(), x=h[sym]||{}, p=D.prices[sym]||{};
   const td=D.dividends.filter(d=>d.symbol===sym).reduce((s,d)=>s+(+d.amount),0);
+
   const card=document.createElement('div'); card.className='aic';
   card.innerHTML=`<div class="aihd">
-    <div><div class="aisym">${sym} <span style="font-size:11.5px;font-weight:400;color:var(--txt3)">${name}</span></div>
-    <div class="aimeta">ราคา ${fB(p.price)} · ถือ ${f(x.volume,0)} หุ้น · P&L ${x.pnl>=0?'+':''}${f(x.pct)}%</div></div>
+    <div>
+      <div class="aisym">${sym} <span style="font-size:11.5px;font-weight:400;color:var(--txt3)">${name}</span></div>
+      <div class="aimeta">ราคา ${fB(p.price)} · ถือ ${f(x.volume,0)} หุ้น · P&L ${x.pnl>=0?'+':''}${f(x.pct)}%</div>
+    </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
       <span class="badge bai">🤖 AI</span><span id="rec-${sym}"></span>
-    </div></div>
+    </div>
+  </div>
   <div class="ldg" id="ld-${sym}"><div class="sp"></div>กำลังวิเคราะห์จากข่าวล่าสุด...</div>
   <div class="ait" id="at-${sym}" style="display:none"></div>`;
   wrap.appendChild(card);
 
-  const prompt=`คุณเป็นนักวิเคราะห์การลงทุน SET ผู้เชี่ยวชาญ วิเคราะห์หุ้น ${sym} (${name}) ตลาดหุ้นไทย
+  const prompt =
+`คุณเป็นนักวิเคราะห์การลงทุน SET ผู้เชี่ยวชาญ วิเคราะห์หุ้น ${sym} (${name}) ตลาดหุ้นไทย
 
 ข้อมูลพอร์ตนักลงทุน:
 • ราคาตลาด: ฿${p.price} | ถือ: ${f(x.volume,0)} หุ้น | ต้นทุนเฉลี่ย: ฿${f(x.avg,3)}
-• กำไร/ขาดทุน: ${x.pnl>=0?'+':''}฿${f(x.pnl)} (${x.pnl>=0?'+':''}${f(x.pct)}%)  
+• กำไร/ขาดทุน: ${x.pnl>=0?'+':''}฿${f(x.pnl)} (${x.pnl>=0?'+':''}${f(x.pct)}%)
 • ปันผลสะสม: ฿${f(td)}
 
 ค้นหาข่าวล่าสุดของ ${sym} แล้ววิเคราะห์ 4 ด้าน (ภาษาไทย ≤200 คำ):
@@ -819,17 +835,25 @@ async function analyzeOne(sym,name,wrap){
 **🎯 คำแนะนำ** — ถือ / ซื้อเพิ่ม / ขายบางส่วน / ขาย พร้อมเหตุผล
 **⚠️ ความเสี่ยงหลัก** — 2-3 ข้อสำคัญ`;
 
-  try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
-    const data=await r.json();
-    let txt=data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
-    txt=txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-    const lo=txt.toLowerCase();
-    const rec=lo.includes('ซื้อเพิ่ม')||(lo.includes('ซื้อ')&&!lo.includes('ขาย'))?'buy':lo.includes('ขาย')?'sell':'hold';
-    set('rec-'+sym,`<span class="badge ${rec==='buy'?'bb2':rec==='sell'?'bs2':'bh'}">${rec==='buy'?'🟢 ซื้อ':rec==='sell'?'🔴 ขาย':'🟡 ถือ'}</span>`);
+  try {
+    // เรียกผ่าน Apps Script (server-side) → ไม่มี CORS
+    const data = await api('analyzeStock', { symbol: sym, prompt });
+    let txt = (data.text || '').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    const lo = txt.toLowerCase();
+    const rec = lo.includes('ซื้อเพิ่ม') || (lo.includes('ซื้อ') && !lo.includes('ขาย')) ? 'buy'
+              : lo.includes('ขาย') ? 'sell' : 'hold';
+    set('rec-'+sym, `<span class="badge ${rec==='buy'?'bb2':rec==='sell'?'bs2':'bh'}">${rec==='buy'?'🟢 ซื้อ':rec==='sell'?'🔴 ขาย':'🟡 ถือ'}</span>`);
     document.getElementById('ld-'+sym).style.display='none';
     const ae=document.getElementById('at-'+sym); ae.style.display='block'; ae.innerHTML=txt;
-  }catch(e){document.getElementById('ld-'+sym).innerHTML=`<span style="color:var(--rose)">❌ ${e.message}</span>`;}
+  } catch(e) {
+    const ldEl = document.getElementById('ld-'+sym);
+    // แสดง error ที่เป็นประโยชน์
+    const msg = e.message||'';
+    const hint = msg.includes('ANTHROPIC_API_KEY')
+      ? '⚙️ ยังไม่ได้ตั้งค่า API Key — ดูวิธีตั้งค่าด้านล่าง'
+      : `❌ ${msg}`;
+    ldEl.innerHTML = `<span style="color:var(--rose)">${hint}</span>`;
+  }
 }
 
 // ═══════════ SEED DATA ═══════════
