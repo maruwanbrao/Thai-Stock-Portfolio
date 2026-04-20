@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Thai Stock Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b0f1a;--ink2:#111827;--ink3:#1c2539;
+  --card:#1e2740;--card2:#232d47;
+  --rim:#2e3d5c;--rim2:#3d5080;
+  --txt:#dce7f8;--txt2:#7b97c4;--txt3:#4a617f;
+  --sky:#3b82f6;--sky2:#2563eb;
+  --jade:#10b981;--jade2:#059669;
+  --rose:#ef4444;--rose2:#dc2626;
+  --amber:#f59e0b;--gold:#fcd34d;
+  --violet:#8b5cf6;
+  --font:'Sarabun',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --rad:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--ink);color:var(--txt);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--ink2)}
+::-webkit-scrollbar-thumb{background:var(--rim2);border-radius:3px}
+
+/* SETUP */
+#setupScreen{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.setup-box{background:var(--card);border:1px solid var(--rim);border-radius:20px;padding:32px;max-width:560px;width:100%}
+.setup-logo{font-size:32px;text-align:center;margin-bottom:6px}
+.setup-title{font-size:22px;font-weight:800;text-align:center;margin-bottom:4px}
+.setup-sub{font-size:13px;color:var(--txt2);text-align:center;margin-bottom:26px}
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:26px}
+.step{display:flex;gap:12px;background:var(--ink2);border:1px solid var(--rim);border-radius:10px;padding:13px}
+.sn{width:26px;height:26px;border-radius:50%;background:var(--sky);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-title{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.sb-desc{font-size:11.5px;color:var(--txt2);line-height:1.6}
+code{font-family:var(--mono);font-size:11px;background:var(--ink);padding:2px 5px;border-radius:4px;color:var(--gold)}
+.url-row{display:flex;gap:8px;margin-top:10px}
+.url-row input{flex:1}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:rgba(11,15,26,.88);z-index:8000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;backdrop-filter:blur(6px)}
+#loader.on{display:flex}
+.lring{width:44px;height:44px;border:3px solid var(--rim);border-top-color:var(--sky);border-radius:50%;animation:spin .8s linear infinite}
+#lmsg{font-size:13px;color:var(--txt2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toast{position:fixed;bottom:22px;right:18px;background:var(--card2);border:1px solid var(--rim2);border-radius:10px;padding:11px 17px;font-size:13px;z-index:7000;display:none;max-width:300px;box-shadow:0 8px 30px rgba(0,0,0,.6);animation:tst .2s ease}
+.toast.on{display:block}
+@keyframes tst{from{opacity:0;transform:translateY(8px)}}
+
+/* APP */
+#app{display:none}
+#app.on{display:block}
+
+.hdr{height:56px;background:var(--ink2);border-bottom:1px solid var(--rim);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.logo{font-size:16px;font-weight:800}
+.logo em{font-style:normal;color:var(--sky)}
+.sync-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt3)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tl{font-family:var(--mono);font-size:11px}
+
+.nav{display:flex;background:var(--ink2);border-bottom:1px solid var(--rim);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nb{flex-shrink:0;padding:12px 16px;font-size:12.5px;font-weight:600;color:var(--txt3);cursor:pointer;border-bottom:2px solid transparent;transition:all .17s;white-space:nowrap;font-family:var(--font);background:none;border-top:none;border-left:none;border-right:none}
+.nb:hover{color:var(--txt2)}
+.nb.on{color:var(--sky);border-bottom-color:var(--sky)}
+
+.wrap{padding:18px;max-width:1380px;margin:0 auto}
+.pg{display:none}
+.pg.on{display:block}
+
+/* KPI */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:13px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:15px 17px;transition:border-color .2s,transform .2s;position:relative;overflow:hidden}
+.kpi:hover{border-color:var(--rim2);transform:translateY(-2px)}
+.kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.015),transparent);pointer-events:none}
+.kl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;font-weight:600}
+.kv{font-size:20px;font-weight:800;font-family:var(--mono);line-height:1}
+.ks{font-size:11px;margin-top:5px;color:var(--txt3)}
+.k-b{border-color:rgba(59,130,246,.3);background:linear-gradient(135deg,var(--card),rgba(59,130,246,.05))}
+.k-g{border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,var(--card),rgba(16,185,129,.05))}
+.k-r{border-color:rgba(239,68,68,.3);background:linear-gradient(135deg,var(--card),rgba(239,68,68,.05))}
+.k-y{border-color:rgba(252,211,77,.3);background:linear-gradient(135deg,var(--card),rgba(252,211,77,.04))}
+
+/* SEC */
+.sec{font-size:10.5px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:2px;margin-bottom:13px;display:flex;align-items:center;gap:10px}
+.sec::after{content:'';flex:1;height:1px;background:var(--rim)}
+
+/* TABLE */
+.tw{overflow-x:auto;border:1px solid var(--rim);border-radius:var(--rad);margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead{background:var(--ink2)}
+thead th{padding:10px 13px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:var(--txt3);font-weight:700;white-space:nowrap;border-bottom:1px solid var(--rim)}
+tbody tr{border-bottom:1px solid var(--rim);transition:background .12s}
+tbody tr:last-child{border:none}
+tbody tr:hover{background:rgba(255,255,255,.022)}
+tbody td{padding:9px 13px;color:var(--txt2);font-family:var(--mono);font-size:12px;white-space:nowrap}
+tbody td:first-child{font-family:var(--font);color:var(--txt)}
+.db{background:none;border:none;color:var(--rose);cursor:pointer;font-size:13px;opacity:.55;transition:opacity .12s}
+.db:hover{opacity:1}
+
+/* STOCK CARDS */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:15px;margin-bottom:20px}
+.sc{background:var(--card);border:1px solid var(--rim);border-radius:15px;overflow:hidden;transition:all .22s}
+.sc:hover{border-color:var(--rim2);transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,.4)}
+.sc-hd{padding:15px 17px 12px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--rim)}
+.sym{font-size:18px;font-weight:800;font-family:var(--mono)}
+.snm{font-size:10.5px;color:var(--txt3);margin-top:2px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb{text-align:right}
+.mp{font-size:20px;font-weight:800;font-family:var(--mono)}
+.cp{font-size:11px;padding:2px 7px;border-radius:20px;font-family:var(--mono);margin-top:3px;display:inline-block;font-weight:600}
+.up{background:rgba(16,185,129,.15);color:var(--jade)}
+.dn{background:rgba(239,68,68,.15);color:var(--rose)}
+.fl{background:rgba(123,154,196,.1);color:var(--txt2)}
+.sc-bd{padding:13px 17px}
+.sr{display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px}
+.sl{color:var(--txt3)}
+.sv{font-family:var(--mono);font-weight:600}
+.bw{margin-top:9px}
+.bl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--txt3);margin-bottom:4px}
+.bb{background:var(--ink);border-radius:4px;height:5px;overflow:hidden}
+.bf{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bg{background:linear-gradient(90deg,var(--jade2),var(--jade))}
+.br2{background:linear-gradient(90deg,var(--rose2),var(--rose))}
+.sc-ft{padding:9px 17px;background:rgba(0,0,0,.18);display:flex;gap:6px;flex-wrap:wrap}
+
+/* ALLOC */
+.al{display:flex;flex-direction:column;gap:10px}
+.ai-inf{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+
+/* CHART */
+.cc{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:17px;margin-bottom:20px}
+.ct{font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:13px}
+canvas{width:100%!important}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;border:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .14s}
+.btn-b{background:var(--sky);color:#fff}
+.btn-b:hover{background:var(--sky2)}
+.btn-g{background:var(--card2);color:var(--txt2);border:1px solid var(--rim2)}
+.btn-g:hover{border-color:var(--sky);color:var(--sky)}
+.btn-d{background:var(--rose);color:#fff}
+.btn-d:hover{background:var(--rose2)}
+.bs{padding:5px 10px;font-size:11.5px;border-radius:6px;border:1px solid var(--rim2);background:var(--card2);color:var(--txt2);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .14s}
+.bs:hover{border-color:var(--sky);color:var(--sky)}
+.bs.buy{background:rgba(16,185,129,.1);color:var(--jade);border-color:rgba(16,185,129,.3)}
+.bs.sell{background:rgba(239,68,68,.08);color:var(--rose);border-color:rgba(239,68,68,.3)}
+.bs.info{background:rgba(59,130,246,.08);color:var(--sky);border-color:rgba(59,130,246,.3)}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.ov.on{display:flex}
+.modal{background:var(--card);border:1px solid var(--rim2);border-radius:18px;width:100%;max-width:450px;max-height:92vh;overflow-y:auto;animation:min .22s ease}
+@keyframes min{from{transform:translateY(22px);opacity:0}}
+.mhd{padding:18px 22px 13px;border-bottom:1px solid var(--rim);display:flex;justify-content:space-between;align-items:center}
+.mttl{font-size:15px;font-weight:700}
+.mcl{width:27px;height:27px;border:1px solid var(--rim2);border-radius:7px;background:transparent;color:var(--txt2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.mcl:hover{background:var(--ink2);color:var(--txt)}
+.mbdy{padding:18px 22px}
+.fg{margin-bottom:14px}
+label{display:block;font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:5px;font-weight:700}
+input,select{width:100%;padding:9px 12px;background:var(--ink2);border:1px solid var(--rim);border-radius:8px;color:var(--txt);font-family:var(--font);font-size:13.5px;outline:none;transition:border-color .14s;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--sky)}
+input[type=number]{font-family:var(--mono)}
+select option{background:var(--ink2)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.mr{display:flex;gap:9px;margin-top:4px}
+.mr .btn{flex:1}
+
+/* AI */
+.aic{background:var(--card);border:1px solid var(--rim);border-radius:14px;padding:17px;margin-bottom:13px}
+.aihd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px;flex-wrap:wrap;gap:8px}
+.aisym{font-size:15px;font-weight:800}
+.aimeta{font-size:11px;color:var(--txt3);margin-top:3px}
+.badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.4px}
+.bb2{background:rgba(16,185,129,.15);color:var(--jade);border:1px solid rgba(16,185,129,.3)}
+.bs2{background:rgba(239,68,68,.15);color:var(--rose);border:1px solid rgba(239,68,68,.3)}
+.bh{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.bai{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
+.ait{font-size:13.5px;line-height:1.85;color:var(--txt2)}
+.ait strong{color:var(--txt)}
+.ldg{display:flex;align-items:center;gap:9px;color:var(--txt3);font-size:12.5px}
+.sp{width:16px;height:16px;border:2px solid var(--rim2);border-top-color:var(--sky);border-radius:50%;animation:spin .7s linear infinite}
+
+/* TAGS */
+.tag{padding:2px 6px;border-radius:4px;font-size:11px;font-family:var(--mono);font-weight:700}
+.tb{background:rgba(16,185,129,.12);color:var(--jade)}
+.ts{background:rgba(239,68,68,.1);color:var(--rose)}
+
+@media(max-width:600px){
+  .wrap{padding:11px}
+  .kgrid{grid-template-columns:repeat(2,1fr);gap:9px}
+  .kpi{padding:12px}
+  .kv{font-size:17px}
+  .sgrid{grid-template-columns:1fr}
+  .fr{grid-template-columns:1fr}
+  .hdr{padding:0 11px}
+  .logo{font-size:14px}
+  .nb{padding:10px 12px;font-size:12px}
+}
+@media(min-width:900px){.kgrid{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setupScreen">
+  <div class="setup-box">
+    <div class="setup-logo">📈</div>
+    <div class="setup-title">Thai Stock Portfolio</div>
+    <div class="setup-sub">ตั้งค่าครั้งเดียว — ข้อมูล Sync ทุกอุปกรณ์ผ่าน Google Sheets ฟรี</div>
+    <div class="steps">
+      <div class="step"><div class="sn">1</div><div><div class="sb-title">สร้าง Google Sheets</div><div class="sb-desc">ไปที่ <a href="https://sheets.new" target="_blank" style="color:var(--sky)">sheets.new</a> สร้าง Spreadsheet ใหม่</div></div></div>
+      <div class="step"><div class="sn">2</div><div><div class="sb-title">วาง Code.gs</div><div class="sb-desc">ใน Sheets → <code>Extensions</code> → <code>Apps Script</code><br>วาง code จากไฟล์ <code>Code.gs</code> แล้ว Save</div></div></div>
+      <div class="step"><div class="sn">3</div><div><div class="sb-title">Deploy Web App</div><div class="sb-desc"><code>Deploy</code> → <code>New deployment</code> → Type: <code>Web app</code><br>Execute as: <strong>Me</strong> &nbsp;|&nbsp; Access: <strong>Anyone</strong><br>คัดลอก URL มาวางด้านล่าง</div></div></div>
+    </div>
+    <div class="fg">
+      <label>Apps Script Web App URL</label>
+      <div class="url-row">
+        <input type="url" id="setupUrl" placeholder="https://script.google.com/macros/s/…/exec">
+        <button class="btn btn-b" onclick="connectAndSeed()">เชื่อมต่อ</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--txt3);margin-top:6px">⚡ จะ import ข้อมูลประวัติทั้งหมดจาก Excel เข้า Google Sheets อัตโนมัติในครั้งแรก</div>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader"><div class="lring"></div><div id="lmsg">กำลังโหลด...</div></div>
+
+<!-- APP -->
+<div id="app">
+  <div class="hdr">
+    <div class="logo">📈 <em>Thai</em>Portfolio</div>
+    <div class="sync-row">
+      <div class="dot" id="sdot"></div>
+      <span id="slbl">Synced</span>
+      <span class="tl" id="stm">—</span>
+      <button class="bs" onclick="refreshAll()" style="padding:3px 9px;margin-left:2px">↻</button>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nb on" onclick="pg('dash',this)">🏠 Dashboard</button>
+    <button class="nb" onclick="pg('port',this)">📊 พอร์ต</button>
+    <button class="nb" onclick="pg('txs',this)">📋 ซื้อ–ขาย</button>
+    <button class="nb" onclick="pg('eqp',this)">💰 DCA</button>
+    <button class="nb" onclick="pg('div',this)">🎯 ปันผล</button>
+    <button class="nb" onclick="pg('ai',this)">🤖 AI</button>
+    <button class="nb" onclick="pg('cfg',this)">⚙️ ตั้งค่า</button>
+  </nav>
+  <div class="wrap">
+
+    <!-- DASHBOARD -->
+    <div class="pg on" id="pg-dash">
+      <div class="kgrid">
+        <div class="kpi k-b"><div class="kl">เงิน DCA รวม</div><div class="kv" id="k-eq" style="color:var(--sky)">–</div><div class="ks" id="k-eq-s">–</div></div>
+        <div class="kpi" id="k-pc"><div class="kl">กำไร / ขาดทุน</div><div class="kv" id="k-pnl">–</div><div class="ks" id="k-pp">–</div></div>
+        <div class="kpi k-b"><div class="kl">มูลค่าพอร์ต</div><div class="kv" id="k-pv" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ราคาตลาด</div></div>
+        <div class="kpi k-y"><div class="kl">ปันผลรวม</div><div class="kv" id="k-dv" style="color:var(--gold)">–</div><div class="ks" style="color:var(--txt3)">ทุกปี</div></div>
+        <div class="kpi k-g"><div class="kl">กำไร+ปันผล</div><div class="kv" id="k-tt" style="color:var(--jade)">–</div><div class="ks" style="color:var(--txt3)">ผลตอบแทนรวม</div></div>
+        <div class="kpi k-b"><div class="kl">หุ้น</div><div class="kv" id="k-cn" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ตัวในพอร์ต</div></div>
+      </div>
+      <div class="sec">สัดส่วนพอร์ต</div>
+      <div class="cc"><div class="al" id="allocL"></div></div>
+      <div class="sec">สรุปหุ้น</div>
+      <div class="tw"><table><thead><tr><th>หุ้น</th><th>ราคาเฉลี่ย</th><th>ราคาตลาด</th><th>ถือ</th><th>มูลค่า</th><th>ต้นทุน</th><th>กำไร/ขาดทุน</th><th>%</th></tr></thead><tbody id="sumTbl"></tbody></table></div>
+      <div class="sec">กราฟ DCA สะสม</div>
+      <div class="cc"><canvas id="eqChart" height="155"></canvas></div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="pg" id="pg-port">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;flex-wrap:wrap;gap:10px">
+        <div class="sec" style="margin:0">หุ้นในพอร์ต</div>
+        <button class="btn btn-b" onclick="openM('mStock')" style="font-size:12.5px;padding:8px 15px">+ เพิ่มหุ้น</button>
+      </div>
+      <div class="sgrid" id="stockGrid"></div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="pg" id="pg-txs">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;flex-wrap:wrap;gap:10px">
+        <div class="sec" style="margin:0">รายการซื้อ–ขาย</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <select id="txFltr" onchange="renderTxs()" style="width:auto;padding:7px 11px;font-size:12.5px"><option value="">ทุกหุ้น</option></select>
+          <button class="btn btn-b" onclick="openAddTx()" style="font-size:12.5px;padding:8px 15px">+ บันทึก</button>
+        </div>
+      </div>
+      <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>ประเภท</th><th>จำนวน</th><th>ราคา/หุ้น</th><th>มูลค่า</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="txTbl"></tbody></table></div>
+    </div>
+
+    <!-- DCA -->
+    <div class="pg" id="pg-eqp">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;flex-wrap:wrap;gap:10px">
+        <div class="sec" style="margin:0">ประวัติโอนเงิน DCA</div>
+        <button class="btn btn-b" onclick="openM('mEq')" style="font-size:12.5px;padding:8px 15px">+ เพิ่ม</button>
+      </div>
+      <div class="kgrid" style="max-width:380px">
+        <div class="kpi k-b"><div class="kl">รวม</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
+        <div class="kpi"><div class="kl">ครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
+      </div>
+      <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="eqTbl"></tbody></table></div>
+    </div>
+
+    <!-- DIVIDEND -->
+    <div class="pg" id="pg-div">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;flex-wrap:wrap;gap:10px">
+        <div class="sec" style="margin:0">เงินปันผล</div>
+        <button class="btn btn-b" onclick="openM('mDiv')" style="font-size:12.5px;padding:8px 15px">+ บันทึก</button>
+      </div>
+      <div class="kgrid" style="max-width:380px">
+        <div class="kpi k-y"><div class="kl">รวมทั้งหมด</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
+        <div class="kpi k-g"><div class="kl">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
+      </div>
+      <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="dvTbl"></tbody></table></div>
+    </div>
+
+    <!-- AI -->
+    <div class="pg" id="pg-ai">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="sec" style="margin:0 0 4px">AI วิเคราะห์หุ้น (Claude + Web Search)</div>
+          <div style="font-size:11.5px;color:var(--txt3)">วิเคราะห์จากข้อมูลพอร์ตจริง + ข่าวสารล่าสุด อัพเดทโดย Claude AI</div>
+        </div>
+        <button class="btn btn-b" id="aBtn" onclick="analyzeAll()">🔍 วิเคราะห์ทั้งหมด</button>
+      </div>
+      <div id="aiCards"></div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="pg" id="pg-cfg">
+      <div class="sec">การตั้งค่า</div>
+      <div class="cc">
+        <div class="fg"><label>Apps Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+          <button class="btn btn-b" onclick="saveUrl()">💾 บันทึก</button>
+          <button class="btn btn-g" onclick="refreshAll()">↻ Sync</button>
+          <button class="btn btn-d" onclick="clearCache()">🗑 Clear Cache</button>
+        </div>
+        <div style="border-top:1px solid var(--rim);padding-top:16px">
+          <div class="sec" style="margin-bottom:12px">อัพเดทราคาหุ้น (Manual)</div>
+          <div id="priceIn"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="ov" id="mTx">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">📋 บันทึกซื้อ–ขาย</div><button class="mcl" onclick="closeM('mTx')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label>หุ้น</label><select id="ftSym"></select></div>
+      <div class="fr">
+        <div class="fg"><label>ประเภท</label><select id="ftType"><option value="Buy">ซื้อ (Buy)</option><option value="Sell">ขาย (Sell)</option></select></div>
+        <div class="fg"><label>วันที่</label><input type="date" id="ftDate"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>จำนวน (หุ้น)</label><input type="number" id="ftVol" placeholder="100" min="0"></div>
+        <div class="fg"><label>ราคา/หุ้น (฿)</label><input type="number" id="ftPx" placeholder="5.00" step="0.001" min="0"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>ค่าธรรมเนียม (฿)</label><input type="number" id="ftFee" value="0" step="0.01"></div>
+        <div class="fg"><label>หมายเหตุ</label><input type="text" id="ftNote" placeholder="DCA"></div>
+      </div>
+      <div class="mr"><button class="btn btn-b" onclick="submitTx()">บันทึก</button><button class="btn btn-g" onclick="closeM('mTx')">ยกเลิก</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="mEq">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">💰 เพิ่มรายการโอนเงิน</div><button class="mcl" onclick="closeM('mEq')">✕</button></div>
+    <div class="mbdy">
+      <div class="fr">
+        <div class="fg"><label>วันที่</label><input type="date" id="feDate"></div>
+        <div class="fg"><label>จำนวน (฿)</label><input type="number" id="feAmt" placeholder="5000" min="0"></div>
+      </div>
+      <div class="fg"><label>หมายเหตุ</label><input type="text" id="feNote" placeholder="DCA รายเดือน"></div>
+      <div class="mr"><button class="btn btn-b" onclick="submitEq()">บันทึก</button><button class="btn btn-g" onclick="closeM('mEq')">ยกเลิก</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="mDiv">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">🎯 บันทึกเงินปันผล</div><button class="mcl" onclick="closeM('mDiv')">✕</button></div>
+    <div class="mbdy">
+      <div class="fg"><label>หุ้น</label><select id="fdSym"></select></div>
+      <div class="fr">
+        <div class="fg"><label>วันที่</label><input type="date" id="fdDate"></div>
+        <div class="fg"><label>จำนวน (฿)</label><input type="number" id="fdAmt" placeholder="1000" step="0.01"></div>
+      </div>
+      <div class="fg"><label>หมายเหตุ</label><input type="text" id="fdNote" placeholder="ปันผลประจำปี"></div>
+      <div class="mr"><button class="btn btn-b" onclick="submitDiv()">บันทึก</button><button class="btn btn-g" onclick="closeM('mDiv')">ยกเลิก</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="mStock">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">➕ เพิ่มหุ้นใหม่</div><button class="mcl" onclick="closeM('mStock')">✕</button></div>
+    <div class="mbdy">
+      <div class="fr">
+        <div class="fg"><label>ชื่อย่อ</label><input type="text" id="nsSym" placeholder="PTT" style="text-transform:uppercase"></div>
+        <div class="fg"><label>ชื่อเต็ม</label><input type="text" id="nsName" placeholder="บริษัท..."></div>
+      </div>
+      <div class="mr"><button class="btn btn-b" onclick="submitStock()">เพิ่ม</button><button class="btn btn-g" onclick="closeM('mStock')">ยกเลิก</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="mDet">
+  <div class="modal" style="max-width:530px">
+    <div class="mhd"><div class="mttl" id="detTitle">รายละเอียด</div><button class="mcl" onclick="closeM('mDet')">✕</button></div>
+    <div class="mbdy" id="detBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════ CONFIG ═══════════
+const LS_URL   = 'tsp_url_v2';
+const LS_CACHE = 'tsp_data_v2';
+const PAL = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#fb7185','#a3e635'];
+let URL = localStorage.getItem(LS_URL) || '';
+let D = (() => { try { const r=localStorage.getItem(LS_CACHE); return r?JSON.parse(r):{stocks:[],transactions:[],equity:[],dividends:[],prices:{}}; } catch(e){ return {stocks:[],transactions:[],equity:[],dividends:[],prices:{}}; } })();
+const save = () => localStorage.setItem(LS_CACHE, JSON.stringify(D));
+
+// ═══════════ API ═══════════
+async function api(action, body={}) {
+  if (!URL) throw new Error('ยังไม่ได้ตั้งค่า URL — ไปที่ ⚙️ ตั้งค่า');
+  const r = await fetch(URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action,...body}) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error||'API error');
+  return j.data;
+}
+async function apiG(action) {
+  if (!URL) throw new Error('ยังไม่ได้ตั้งค่า URL');
+  const r = await fetch(`${URL}?action=${action}`);
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error||'API error');
+  return j.data;
+}
+
+// ═══════════ SETUP ═══════════
+async function connectAndSeed() {
+  const url = document.getElementById('setupUrl').value.trim();
+  if (!url.includes('script.google.com')) { toast('⚠️ URL ไม่ถูกต้อง'); return; }
+  localStorage.setItem(LS_URL, url); URL = url;
+  load('กำลัง import ข้อมูลประวัติทั้งหมด...');
+  try {
+    await api('seed', buildSeed());
+    await pull();
+    document.getElementById('setupScreen').style.display='none';
+    document.getElementById('app').classList.add('on');
+    toast('✅ เชื่อมต่อสำเร็จ! ข้อมูลทั้งหมดถูก import เข้า Google Sheets แล้ว');
+  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+}
+
+// ═══════════ SYNC ═══════════
+async function refreshAll() {
+  dot('syncing');
+  try {
+    const data = await apiG('getAll');
+    D.stocks       = data.stocks       || [];
+    D.transactions = data.transactions || [];
+    D.equity       = data.equity       || [];
+    D.dividends    = data.dividends    || [];
+    D.prices       = data.prices       || {};
+    save(); renderAll(); dot('ok');
+    document.getElementById('stm').textContent = new Date().toLocaleTimeString('th-TH');
+  } catch(e) { dot('err'); toast('⚠️ Sync ล้มเหลว (ใช้ cache): '+e.message); renderAll(); }
+}
+function dot(s) {
+  const d=document.getElementById('sdot'), l=document.getElementById('slbl');
+  if (s==='syncing') { d.style.background='var(--amber)'; l.textContent='Syncing…'; }
+  else if (s==='ok') { d.style.background='var(--jade)'; l.textContent='Synced'; }
+  else               { d.style.background='var(--rose)'; l.textContent='Offline'; }
+}
+
+// ═══════════ CALC ═══════════
+function hld() {
+  const m={};
+  D.stocks.forEach(s=>{ m[s.symbol]={...s,volume:0,cost:0}; });
+  D.transactions.forEach(t=>{
+    if (!m[t.symbol]) return;
+    const h=m[t.symbol], v=+t.volume, p=+t.price, f=+(t.fee||0);
+    if (t.type==='Buy'){ h.cost+=v*p+f; h.volume+=v; }
+    else { const a=h.volume>0?h.cost/h.volume:0; h.cost-=v*a-f; h.volume-=v; }
+  });
+  Object.values(m).forEach(h=>{
+    h.avg=h.volume>0?h.cost/h.volume:0;
+    const p=D.prices[h.symbol]||{};
+    h.mp=+(p.price||0); h.mv=h.volume*h.mp;
+    h.pnl=h.mv-h.cost; h.pct=h.cost>0?h.pnl/h.cost*100:0;
+    h.chg=+(p.change||0); h.cpct=+(p.changePct||0);
+  });
+  return m;
+}
+function totals() {
+  const h=hld(); let cost=0,val=0;
+  Object.values(h).forEach(x=>{cost+=x.cost;val+=x.mv;});
+  const pnl=val-cost, pp=cost>0?pnl/cost*100:0;
+  const div=D.dividends.reduce((s,d)=>s+(+d.amount),0);
+  const eq=D.equity.reduce((s,e)=>s+(+e.amount),0);
+  return {cost,val,pnl,pp,div,eq};
+}
+
+// ═══════════ FORMAT ═══════════
+const f=(n,d=2)=>isNaN(+n)?'–':new Intl.NumberFormat('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
+const fB=(n,d=2)=>'฿'+f(n,d);
+const set=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h;};
+
+// ═══════════ RENDER ═══════════
+let eqCI=null;
+function renderAll(){renderDash();renderPort();renderTxs();renderEq();renderDiv();renderCfg();fillSelects();}
+
+function renderDash(){
+  const t=totals(), h=hld(), g=t.pnl>=0;
+  set('k-eq',fB(t.eq)); set('k-eq-s',`DCA ${D.equity.length} ครั้ง`);
+  const pe=document.getElementById('k-pnl');
+  pe.textContent=(g?'+':'')+fB(t.pnl); pe.style.color=g?'var(--jade)':'var(--rose)';
+  document.getElementById('k-pc').className=`kpi ${g?'k-g':'k-r'}`;
+  set('k-pp',`<span style="color:${g?'var(--jade)':'var(--rose)'}">${g?'▲':'▼'} ${f(Math.abs(t.pp))}%</span>`);
+  set('k-pv',fB(t.val)); set('k-dv',fB(t.div));
+  set('k-tt',fB(t.pnl+t.div)); set('k-cn',D.stocks.length+'');
+
+  set('sumTbl', Object.values(h).map(x=>{
+    const g=x.pnl>=0;
+    return `<tr>
+      <td><b style="color:${x.color||'var(--sky)'}">${x.symbol}</b></td>
+      <td>${fB(x.avg,3)}</td><td>${fB(x.mp)}</td><td>${f(x.volume,0)}</td>
+      <td>${fB(x.mv)}</td><td>${fB(x.cost)}</td>
+      <td style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${fB(x.pnl)}</td>
+      <td style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</td>
+    </tr>`;
+  }).join(''));
+
+  const tv=Object.values(h).reduce((s,x)=>s+x.mv,0);
+  set('allocL', Object.values(h).map(x=>{
+    const p=tv>0?x.mv/tv*100:0;
+    return `<div class="alloc-item">
+      <div class="ai-inf"><span style="color:${x.color||'var(--sky)'};font-weight:700">${x.symbol}</span>
+      <span style="color:var(--txt2)">${f(p,1)}% &nbsp; ${fB(x.mv)}</span></div>
+      <div class="bb"><div class="bf" style="width:${p}%;background:${x.color||'var(--sky)'}"></div></div>
+    </div>`;
+  }).join(''));
+
+  // Equity chart
+  const sorted=[...D.equity].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  let cum=0; const lbs=[],vs=[],step=Math.max(1,Math.floor(sorted.length/45));
+  sorted.forEach((e,i)=>{ cum+=+e.amount; if(i%step===0||i===sorted.length-1){lbs.push(e.date.substr(0,7));vs.push(+cum.toFixed(2));} });
+  const ctx=document.getElementById('eqChart');
+  if(eqCI){eqCI.destroy();eqCI=null;}
+  if(window.Chart) eqCI=new Chart(ctx,{type:'line',data:{labels:lbs,datasets:[{label:'DCA สะสม',data:vs,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.07)',borderWidth:2,fill:true,tension:.4,pointRadius:0}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'฿'+f(c.raw)}}},scales:{x:{grid:{color:'#1c2539'},ticks:{color:'#4a617f',maxTicksLimit:10,font:{size:10}}},y:{grid:{color:'#1c2539'},ticks:{color:'#4a617f',font:{size:10},callback:v=>'฿'+f(v,0)}}}}});
+}
+
+function renderPort(){
+  const h=hld();
+  set('stockGrid', Object.values(h).map(x=>{
+    const g=x.pnl>=0, cc=x.cpct>0?'up':x.cpct<0?'dn':'fl', bw=Math.min(Math.abs(x.pct)*2,100);
+    return `<div class="sc">
+      <div class="sc-hd">
+        <div><div class="sym" style="color:${x.color||'var(--sky)'}">${x.symbol}</div><div class="snm">${x.name||''}</div></div>
+        <div class="pb"><div class="mp" style="color:${x.color||'var(--sky)'}">${fB(x.mp)}</div>
+        <div class="cp ${cc}">${x.cpct>=0?'▲':'▼'} ${f(Math.abs(x.cpct))}%</div></div>
+      </div>
+      <div class="sc-bd">
+        <div class="sr"><span class="sl">ถือ</span><span class="sv">${f(x.volume,0)} หุ้น</span></div>
+        <div class="sr"><span class="sl">ราคาเฉลี่ย</span><span class="sv">${fB(x.avg,3)}</span></div>
+        <div class="sr"><span class="sl">มูลค่า</span><span class="sv">${fB(x.mv)}</span></div>
+        <div class="sr"><span class="sl">ต้นทุน</span><span class="sv">${fB(x.cost)}</span></div>
+        <div class="sr"><span class="sl">กำไร/ขาดทุน</span><span class="sv" style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${fB(x.pnl)}</span></div>
+        <div class="bw"><div class="bl"><span>${g?'กำไร':'ขาดทุน'}</span><span style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</span></div>
+        <div class="bb"><div class="bf ${g?'bg':'br2'}" style="width:${bw}%"></div></div></div>
+      </div>
+      <div class="sc-ft">
+        <button class="bs buy" onclick="openTxFor('${x.symbol}','Buy')">+ ซื้อ</button>
+        <button class="bs sell" onclick="openTxFor('${x.symbol}','Sell')">− ขาย</button>
+        <button class="bs info" onclick="openDet('${x.symbol}')">📊 รายละเอียด</button>
+      </div>
+    </div>`;
+  }).join(''));
+}
+
+function renderTxs(){
+  const flt=document.getElementById('txFltr').value;
+  const list=[...D.transactions].filter(t=>!flt||t.symbol===flt).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  set('txTbl', list.map((t,i)=>`<tr>
+    <td>${i+1}</td><td>${t.date}</td>
+    <td><b>${t.symbol}</b></td>
+    <td><span class="tag ${t.type==='Buy'?'tb':'ts'}">${t.type}</span></td>
+    <td>${f(t.volume,0)}</td><td>${fB(+t.price,3)}</td>
+    <td>${fB(+t.volume*+t.price)}</td>
+    <td style="color:var(--txt3)">${t.note||''}</td>
+    <td><button class="db" onclick="delTx('${t.id}')">✕</button></td>
+  </tr>`).join(''));
+}
+
+function renderEq(){
+  const s=[...D.equity].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tot=s.reduce((x,e)=>x+(+e.amount),0);
+  set('eqTot',fB(tot)); set('eqCnt',s.length+'');
+  set('eqTbl', s.map((e,i)=>`<tr>
+    <td>${i+1}</td><td>${e.date}</td>
+    <td style="color:var(--sky)">${fB(+e.amount)}</td>
+    <td style="color:var(--txt3)">${e.note||''}</td>
+    <td><button class="db" onclick="delEq('${e.id}')">✕</button></td>
+  </tr>`).join(''));
+}
+
+function renderDiv(){
+  const s=[...D.dividends].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tot=s.reduce((x,d)=>x+(+d.amount),0);
+  const yr=s.filter(d=>String(d.date).startsWith(new Date().getFullYear())).reduce((x,d)=>x+(+d.amount),0);
+  set('dvTot',fB(tot)); set('dvYr',fB(yr));
+  set('dvTbl', s.map((d,i)=>`<tr>
+    <td>${i+1}</td><td>${d.date}</td>
+    <td><b>${d.symbol}</b></td>
+    <td style="color:var(--gold)">${fB(+d.amount)}</td>
+    <td style="color:var(--txt3)">${d.note||''}</td>
+    <td><button class="db" onclick="delDiv('${d.id}')">✕</button></td>
+  </tr>`).join(''));
+}
+
+function renderCfg(){
+  document.getElementById('cfgUrl').value=URL;
+  set('priceIn', D.stocks.map(s=>{
+    const p=D.prices[s.symbol]||{};
+    return `<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+      <span style="font-family:var(--mono);font-weight:700;color:${s.color||'var(--sky)'};min-width:55px;font-size:13px">${s.symbol}</span>
+      <input type="number" step="0.01" value="${p.price||''}" placeholder="ราคา" id="pi-${s.symbol}" style="width:95px;padding:6px 9px;font-size:12px">
+      <button class="bs" onclick="savePrice('${s.symbol}')">บันทึก</button>
+    </div>`;
+  }).join(''));
+}
+
+function fillSelects(){
+  ['ftSym','fdSym','txFltr'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    const cur=el.value;
+    el.innerHTML=(id==='txFltr'?'<option value="">ทุกหุ้น</option>':'')+D.stocks.map(s=>`<option value="${s.symbol}">${s.symbol}</option>`).join('');
+    if(cur) el.value=cur;
+  });
+}
+
+// ═══════════ ACTIONS ═══════════
+const load=(m='กำลังโหลด...')=>{document.getElementById('lmsg').textContent=m;document.getElementById('loader').classList.add('on')};
+const unload=()=>document.getElementById('loader').classList.remove('on');
+const openM=(id)=>document.getElementById(id).classList.add('on');
+const closeM=(id)=>document.getElementById(id).classList.remove('on');
+function toast(msg,dur=3200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),dur);}
+function pg(id,btn){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));document.getElementById('pg-'+id).classList.add('on');if(btn)btn.classList.add('on');}
+const today=()=>new Date().toISOString().split('T')[0];
+const gv=id=>document.getElementById(id)?.value||'';
+
+function openAddTx(){fillSelects();document.getElementById('ftDate').value=today();openM('mTx');}
+function openTxFor(sym,type){fillSelects();document.getElementById('ftSym').value=sym;document.getElementById('ftType').value=type;document.getElementById('ftDate').value=today();openM('mTx');}
+
+async function submitTx(){
+  const b={symbol:gv('ftSym'),type:gv('ftType'),date:gv('ftDate'),volume:+gv('ftVol'),price:+gv('ftPx'),fee:+(gv('ftFee')||0),note:gv('ftNote')};
+  if(!b.date||!b.volume||!b.price){toast('⚠️ กรอกข้อมูลให้ครบ');return;}
+  load('กำลังบันทึก...');
+  try {
+    const r=await api('addTx',b); D.transactions.push({...b,id:r.id}); save();
+    closeM('mTx'); renderAll(); toast(`✅ บันทึก ${b.type} ${b.symbol}`);
+  } catch(e){toast('❌ '+e.message);} finally{unload();}
+}
+async function delTx(id){
+  if(!confirm('ลบรายการนี้?'))return; load();
+  try{await api('deleteTx',{id});D.transactions=D.transactions.filter(t=>t.id!==id);save();renderTxs();renderDash();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+async function submitEq(){
+  const b={date:gv('feDate'),amount:+gv('feAmt'),note:gv('feNote')};
+  if(!b.date||!b.amount){toast('⚠️ กรอกข้อมูลให้ครบ');return;}
+  load();
+  try{const r=await api('addEquity',b);D.equity.push({...b,id:r.id});save();closeM('mEq');renderEq();renderDash();toast('✅ บันทึกสำเร็จ');}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+async function delEq(id){
+  if(!confirm('ลบ?'))return;load();
+  try{await api('deleteEquity',{id});D.equity=D.equity.filter(e=>e.id!==id);save();renderEq();renderDash();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+async function submitDiv(){
+  const b={symbol:gv('fdSym'),date:gv('fdDate'),amount:+gv('fdAmt'),note:gv('fdNote')};
+  if(!b.date||!b.amount){toast('⚠️ กรอกข้อมูลให้ครบ');return;}
+  load();
+  try{const r=await api('addDividend',b);D.dividends.push({...b,id:r.id});save();closeM('mDiv');renderDiv();renderDash();toast('✅ บันทึกปันผลสำเร็จ');}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+async function delDiv(id){
+  if(!confirm('ลบ?'))return;load();
+  try{await api('deleteDividend',{id});D.dividends=D.dividends.filter(d=>d.id!==id);save();renderDiv();renderDash();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+async function submitStock(){
+  const sym=gv('nsSym').trim().toUpperCase(), name=gv('nsName').trim();
+  if(!sym){toast('⚠️ ใส่ชื่อย่อหุ้น');return;}
+  if(D.stocks.find(s=>s.symbol===sym)){toast('⚠️ หุ้นนี้มีอยู่แล้ว');return;}
+  const color=PAL[D.stocks.length%PAL.length];
+  load();
+  try{const r=await api('addStock',{symbol:sym,name,color});D.stocks.push({symbol:sym,name,color,id:r.id});save();closeM('mStock');renderAll();toast(`✅ เพิ่ม ${sym}`);}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+async function savePrice(sym){
+  const px=+(document.getElementById('pi-'+sym)?.value);
+  if(!px)return; load('อัพเดทราคา...');
+  try{await api('setPrice',{symbol:sym,price:px,change:0,changePct:0});D.prices[sym]={price:px,change:0,changePct:0};save();renderAll();toast(`✅ อัพเดทราคา ${sym}`);}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+function saveUrl(){const u=document.getElementById('cfgUrl').value.trim();localStorage.setItem(LS_URL,u);URL=u;toast('✅ บันทึก URL สำเร็จ');refreshAll();}
+function clearCache(){if(!confirm('ล้าง cache ใน browser?'))return;localStorage.removeItem(LS_CACHE);D={stocks:[],transactions:[],equity:[],dividends:[],prices:{}};renderAll();toast('✅ ล้าง cache แล้ว — กด Sync ↻');}
+
+function openDet(sym){
+  const h=hld(), x=h[sym]||{};
+  const txs=D.transactions.filter(t=>t.symbol===sym).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const divs=D.dividends.filter(d=>d.symbol===sym);
+  const td=divs.reduce((s,d)=>s+(+d.amount),0);
+  const g=x.pnl>=0;
+  document.getElementById('detTitle').textContent=`📊 ${sym} – รายละเอียด`;
+  set('detBody',`
+    <div class="kgrid" style="grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px">
+      <div class="kpi k-b"><div class="kl">ราคาตลาด</div><div class="kv" style="color:var(--sky)">${fB(x.mp)}</div></div>
+      <div class="kpi ${g?'k-g':'k-r'}"><div class="kl">P&L %</div><div class="kv" style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</div></div>
+      <div class="kpi"><div class="kl">ถือ (หุ้น)</div><div class="kv">${f(x.volume,0)}</div></div>
+      <div class="kpi k-y"><div class="kl">ปันผลรวม</div><div class="kv" style="color:var(--gold)">${fB(td)}</div></div>
+    </div>
+    <div class="sec" style="font-size:10px">${txs.length} รายการล่าสุด</div>
+    <div style="max-height:250px;overflow-y:auto">
+    <table><thead><tr><th>วันที่</th><th>ประเภท</th><th>จำนวน</th><th>ราคา</th></tr></thead>
+    <tbody>${txs.slice(0,25).map(t=>`<tr>
+      <td>${t.date}</td>
+      <td><span class="tag ${t.type==='Buy'?'tb':'ts'}">${t.type}</span></td>
+      <td>${f(t.volume,0)}</td><td>${fB(+t.price,3)}</td>
+    </tr>`).join('')}</tbody></table></div>`);
+  openM('mDet');
+}
+
+// ═══════════ AI ANALYSIS ═══════════
+async function analyzeAll(){
+  const btn=document.getElementById('aBtn'); btn.disabled=true;btn.textContent='⏳ กำลังวิเคราะห์...';
+  const wrap=document.getElementById('aiCards'); wrap.innerHTML='';
+  for(const s of D.stocks) await analyzeOne(s.symbol,s.name||'',wrap);
+  btn.disabled=false;btn.textContent='🔍 วิเคราะห์ทั้งหมด';
+}
+async function analyzeOne(sym,name,wrap){
+  const h=hld(), x=h[sym]||{}, p=D.prices[sym]||{};
+  const td=D.dividends.filter(d=>d.symbol===sym).reduce((s,d)=>s+(+d.amount),0);
+  const card=document.createElement('div'); card.className='aic';
+  card.innerHTML=`<div class="aihd">
+    <div><div class="aisym">${sym} <span style="font-size:11.5px;font-weight:400;color:var(--txt3)">${name}</span></div>
+    <div class="aimeta">ราคา ${fB(p.price)} · ถือ ${f(x.volume,0)} หุ้น · P&L ${x.pnl>=0?'+':''}${f(x.pct)}%</div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <span class="badge bai">🤖 AI</span><span id="rec-${sym}"></span>
+    </div></div>
+  <div class="ldg" id="ld-${sym}"><div class="sp"></div>กำลังวิเคราะห์จากข่าวล่าสุด...</div>
+  <div class="ait" id="at-${sym}" style="display:none"></div>`;
+  wrap.appendChild(card);
+
+  const prompt=`คุณเป็นนักวิเคราะห์การลงทุน SET ผู้เชี่ยวชาญ วิเคราะห์หุ้น ${sym} (${name}) ตลาดหุ้นไทย
+
+ข้อมูลพอร์ตนักลงทุน:
+• ราคาตลาด: ฿${p.price} | ถือ: ${f(x.volume,0)} หุ้น | ต้นทุนเฉลี่ย: ฿${f(x.avg,3)}
+• กำไร/ขาดทุน: ${x.pnl>=0?'+':''}฿${f(x.pnl)} (${x.pnl>=0?'+':''}${f(x.pct)}%)  
+• ปันผลสะสม: ฿${f(td)}
+
+ค้นหาข่าวล่าสุดของ ${sym} แล้ววิเคราะห์ 4 ด้าน (ภาษาไทย ≤200 คำ):
+**📊 ธุรกิจ/ผลประกอบการ** — สรุปสั้น
+**📰 ข่าว/ปัจจัยปัจจุบัน** — สิ่งกระทบราคาตอนนี้
+**🎯 คำแนะนำ** — ถือ / ซื้อเพิ่ม / ขายบางส่วน / ขาย พร้อมเหตุผล
+**⚠️ ความเสี่ยงหลัก** — 2-3 ข้อสำคัญ`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})});
+    const data=await r.json();
+    let txt=data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+    txt=txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    const lo=txt.toLowerCase();
+    const rec=lo.includes('ซื้อเพิ่ม')||(lo.includes('ซื้อ')&&!lo.includes('ขาย'))?'buy':lo.includes('ขาย')?'sell':'hold';
+    set('rec-'+sym,`<span class="badge ${rec==='buy'?'bb2':rec==='sell'?'bs2':'bh'}">${rec==='buy'?'🟢 ซื้อ':rec==='sell'?'🔴 ขาย':'🟡 ถือ'}</span>`);
+    document.getElementById('ld-'+sym).style.display='none';
+    const ae=document.getElementById('at-'+sym); ae.style.display='block'; ae.innerHTML=txt;
+  }catch(e){document.getElementById('ld-'+sym).innerHTML=`<span style="color:var(--rose)">❌ ${e.message}</span>`;}
+}
+
+// ═══════════ SEED DATA ═══════════
+function buildSeed(){
+  const u=()=>Math.random().toString(36).substr(2,9);
+  const stocks=[
+    {id:u(),symbol:'UPOIC',name:'Union Pioneer Oil International',color:'#3b82f6'},
+    {id:u(),symbol:'SC',name:'SC Asset Corporation',color:'#10b981'},
+    {id:u(),symbol:'SIRI',name:'Sansiri Public Company',color:'#f59e0b'},
+    {id:u(),symbol:'SCAP',name:'Seamico Capital',color:'#8b5cf6'},
+    {id:u(),symbol:'AIT',name:'Advanced Info Tech',color:'#ef4444'},
+  ];
+  const prices={UPOIC:{price:7.60,change:0.50,changePct:7.04},SC:{price:1.97,change:-0.02,changePct:-1.01},SIRI:{price:1.41,change:-0.03,changePct:-2.08},SCAP:{price:1.07,change:0,changePct:0},AIT:{price:4.88,change:0,changePct:0}};
+  const T=(d,s,tp,v,p,n='DCA')=>({id:u(),date:d,symbol:s,type:tp,volume:v,price:p,fee:0,note:n});
+  const transactions=[
+    T('2025-02-25','UPOIC','Buy',31200,6.468,'Initial'),T('2025-03-03','UPOIC','Buy',100,6.8113),T('2025-03-04','UPOIC','Buy',100,6.8113),T('2025-03-31','UPOIC','Buy',400,6.31065),T('2026-02-13','UPOIC','Buy',100,6.8114),T('2026-02-17','UPOIC','Buy',100,6.6612),T('2026-02-20','UPOIC','Buy',100,6.7112),
+    T('2025-02-25','SC','Buy',13800,3.463,'Initial'),T('2025-03-03','SC','Buy',100,2.5043),T('2025-03-03','SC','Buy',100,2.5243),T('2025-03-03','SC','Buy',200,2.5443),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.4841),T('2025-03-06','SC','Buy',100,2.5243),T('2025-03-06','SC','Buy',100,2.5243),T('2025-03-30','SC','Buy',400,2.404),T('2026-02-13','SC','Buy',200,1.9032),T('2026-02-13','SC','Buy',100,1.8931),T('2026-02-13','SC','Buy',100,1.8831),T('2026-02-13','SC','Buy',100,1.8731),T('2026-02-17','SC','Buy',100,1.9432),T('2026-02-18','SC','Buy',100,2.0633),T('2026-02-20','SC','Buy',200,2.0434),
+    T('2025-02-25','SIRI','Buy',11200,1.7514,'Initial'),T('2025-03-03','SIRI','Buy',100,1.6728),T('2025-03-03','SIRI','Buy',300,1.6828),T('2025-03-04','SIRI','Buy',100,1.6828),T('2025-03-06','SIRI','Buy',100,1.6928),T('2025-03-06','SIRI','Buy',100,1.6928),T('2025-03-30','SIRI','Buy',300,1.4525),T('2025-03-30','SIRI','Buy',100,1.4425),T('2026-02-09','SIRI','Buy',100,1.4224),T('2026-02-09','SIRI','Buy',100,1.4124),T('2026-02-10','SIRI','Buy',100,1.4224),T('2026-02-13','SIRI','Buy',200,1.4625),T('2026-02-13','SIRI','Buy',100,1.4525),T('2026-02-18','SIRI','Buy',100,1.5226),T('2026-02-18','SIRI','Buy',100,1.5127),T('2026-02-20','SIRI','Buy',100,1.5626),T('2026-02-23','SIRI','Buy',100,1.5727),
+    T('2025-01-24','SCAP','Buy',16,2.28375,'Initial'),
+    T('2024-02-25','AIT','Buy',1500,4.2899,'Initial'),T('2025-03-04','AIT','Buy',100,4.5076),T('2025-03-04','AIT','Buy',100,4.4875),T('2025-03-30','AIT','Buy',400,4.6077),
+  ];
+  const E=(d,a,n='DCA')=>({id:u(),date:d,amount:a,note:n});
+  const equity=[E('2018-03-02',1000),E('2018-03-28',1000),E('2018-04-17',500),E('2018-05-03',900),E('2018-05-10',1300),E('2018-05-17',500),E('2018-05-28',1000),E('2018-06-05',800),E('2018-06-27',1000),E('2018-06-29',800),E('2018-07-26',1000),E('2018-08-29',1000),E('2018-09-11',600),E('2018-09-12',1000),E('2018-09-28',1000),E('2018-10-05',500),E('2018-10-25',1000),E('2018-11-28',1000),E('2018-12-24',100),E('2018-12-28',1000),E('2019-01-11',600),E('2019-01-28',1000),E('2019-01-30',500),E('2019-02-28',1000),E('2019-03-01',1000),E('2019-03-28',1000),E('2019-04-26',1000),E('2019-05-28',1000),E('2019-06-28',1000),E('2019-07-26',1000),E('2019-08-28',1000),E('2019-09-27',1000),E('2019-10-28',1000),E('2019-11-19',1000),E('2019-11-28',2000),E('2019-12-27',2000),E('2020-01-22',1000),E('2020-01-28',2000),E('2020-02-28',2000),E('2020-03-27',2000),E('2020-04-28',2000),E('2020-05-28',2000),E('2020-06-25',2000),E('2020-07-24',2000),E('2020-08-28',2000),E('2020-09-28',2000),E('2020-10-28',2000),E('2020-11-27',2000),E('2020-12-28',2000),E('2021-01-28',2000),E('2021-02-25',2000),E('2021-03-26',2000),E('2021-04-28',2000),E('2021-05-28',2000),E('2021-06-28',2000),E('2021-07-27',3000),E('2021-08-27',3000),E('2021-09-28',3000),E('2021-10-28',3000),E('2021-11-26',3000),E('2021-12-28',3000),E('2022-01-31',3000),E('2022-02-28',3000),E('2022-03-28',3000),E('2022-04-28',3000),E('2022-05-27',3000),E('2022-06-28',3000),E('2022-07-27',3000),E('2022-08-26',3000),E('2022-09-28',3000),E('2022-10-28',3000),E('2022-11-28',3000),E('2022-12-28',3000),E('2023-01-27',3000),E('2023-02-28',3000),E('2023-03-28',3000),E('2023-04-28',3000),E('2023-05-03',7000),E('2023-05-28',4000),E('2023-06-30',4000),E('2023-07-29',4000),E('2023-08-31',4000),E('2023-09-29',4000),E('2023-10-30',4000),E('2023-11-29',4000),E('2023-12-27',4000),E('2024-01-29',4000),E('2024-02-28',4000),E('2024-03-28',4000),E('2024-04-30',5000),E('2024-05-23',8791.4),E('2024-05-31',5000),E('2024-07-01',5000),E('2024-07-30',5000),E('2024-08-28',5000),E('2024-09-30',5000),E('2024-11-01',5000),E('2024-12-02',5000),E('2025-01-02',6000),E('2025-02-03',6000),E('2025-03-03',6000),E('2026-01-09',5000)];
+  const D2=(d,s,a,n='')=>({id:u(),date:d,symbol:s,amount:a,note:n});
+  const dividends=[D2('2023-05-03','UPOIC',7000,'ปันผลประจำปี'),D2('2024-05-20','SIRI',441,'ปันผล'),D2('2024-05-21','SC',979.2,'ปันผล'),D2('2024-05-21','UPOIC',7371.2,'ปันผล'),D2('2024-09-11','SC',516.6,'ปันผล'),D2('2024-09-09','SIRI',459,'ปันผล'),D2('2025-04-30','AIT',756,'ปันผล'),D2('2025-04-30','UPOIC',9357.2,'ปันผล'),D2('2025-04-30','SIRI',856.8,'ยังไม่โอนเข้าพอร์ต'),D2('2025-04-30','SC',1504.8,'ปันผล'),D2('2025-04-30','SC',3591.62,'Tax Refund')];
+  return {stocks,transactions,equity,dividends,prices};
+}
+
+// ═══════════ CLOSE OVERLAYS ═══════════
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');}));
+
+// ═══════════ INIT ═══════════
+window.addEventListener('load',()=>{
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+  s.onload=()=>{
+    if(URL){
+      document.getElementById('setupScreen').style.display='none';
+      document.getElementById('app').classList.add('on');
+      renderAll();      // render from cache instantly
+      refreshAll();     // then sync from Sheets
+      setInterval(refreshAll, 120000); // auto-sync every 2 min
+    }
+  };
+  document.head.appendChild(s);
+});
+</script>
+</body>
+</html>
