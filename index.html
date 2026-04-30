@@ -301,7 +301,7 @@ select option{background:var(--ink2)}
         <div class="sec ph-title">หุ้นในพอร์ต</div>
         <div class="ph-actions">
           <button class="btn btn-g" onclick="triggerFetchPrices()" style="font-size:12px;padding:7px 13px">🔄 อัพเดทราคา</button>
-          <button class="btn btn-b" onclick="openM('mStock')" style="font-size:12px;padding:7px 13px">+ เพิ่มหุ้น</button>
+          <button class="btn btn-b" onclick="openAddStock()" style="font-size:12px;padding:7px 13px">+ เพิ่มหุ้น</button>
         </div>
       </div>
       <div class="sgrid" id="stockGrid"></div>
@@ -323,7 +323,7 @@ select option{background:var(--ink2)}
     <div class="pg" id="pg-eqp">
       <div class="ph">
         <div class="sec ph-title">ประวัติโอนเงิน DCA</div>
-        <button class="btn btn-b" onclick="openM('mEq')" style="font-size:12px;padding:7px 13px">+ เพิ่ม</button>
+        <button class="btn btn-b" onclick="openAddEq()" style="font-size:12px;padding:7px 13px">+ เพิ่ม</button>
       </div>
       <div class="kgrid" style="max-width:500px">
         <div class="kpi k-b"><div class="kl">รวมทั้งหมด</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
@@ -336,7 +336,7 @@ select option{background:var(--ink2)}
     <div class="pg" id="pg-div">
       <div class="ph">
         <div class="sec ph-title">เงินปันผล</div>
-        <button class="btn btn-b" onclick="openM('mDiv')" style="font-size:12px;padding:7px 13px">+ บันทึก</button>
+        <button class="btn btn-b" onclick="openAddDiv()" style="font-size:12px;padding:7px 13px">+ บันทึก</button>
       </div>
       <div class="kgrid" style="max-width:500px">
         <div class="kpi k-y"><div class="kl">รวมทั้งหมด</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
@@ -354,7 +354,7 @@ select option{background:var(--ink2)}
         </div>
         <div class="ph-actions">
           <button class="btn btn-line" onclick="testLine()" style="font-size:12px;padding:7px 13px">🔔 ทดสอบ Line</button>
-          <button class="btn btn-b" onclick="openM('mAlert')" style="font-size:12px;padding:7px 13px">+ ตั้งเป้า</button>
+          <button class="btn btn-b" onclick="openAddAlert()" style="font-size:12px;padding:7px 13px">+ ตั้งเป้า</button>
         </div>
       </div>
       <div class="info-blue">
@@ -781,7 +781,7 @@ function renderPort() {
       <div class="sc-ft">
         <button class="bs buy"   onclick="openTxFor('${x.symbol}','Buy')">+ ซื้อ</button>
         <button class="bs sell"  onclick="openTxFor('${x.symbol}','Sell')">− ขาย</button>
-        <button class="bs alert" onclick="quickAlert('${x.symbol}',${x.mp})">🔔 ตั้งเป้า</button>
+        <button class="bs alert" onclick="quickAlert('${x.symbol}')">🔔 ตั้งเป้า</button>
         <button class="bs info"  onclick="openDet('${x.symbol}')">📊 รายละเอียด</button>
       </div>
     </div>`;
@@ -945,18 +945,49 @@ document.querySelectorAll('.ov').forEach(o => o.addEventListener('click', e => {
 // ══════════════════════════════════════════════
 //  ACTIONS — TRANSACTIONS
 // ══════════════════════════════════════════════
-function openAddTx() { fillSelects(); document.getElementById('ftDate').value=today(); openM('mTx'); }
-function openTxFor(sym, type) { fillSelects(); document.getElementById('ftSym').value=sym; document.getElementById('ftType').value=type; document.getElementById('ftDate').value=today(); openM('mTx'); }
+function openAddTx() {
+  fillSelects();
+  document.getElementById('ftDate').value = today();
+  document.getElementById('ftVol').value  = '';
+  document.getElementById('ftPx').value   = '';
+  document.getElementById('ftFee').value  = '0';
+  document.getElementById('ftNote').value = '';
+  openM('mTx');
+}
+function openTxFor(sym, type) {
+  fillSelects();
+  document.getElementById('ftSym').value  = sym;
+  document.getElementById('ftType').value = type;
+  document.getElementById('ftDate').value = today();
+  document.getElementById('ftVol').value  = '';
+  document.getElementById('ftPx').value   = '';
+  document.getElementById('ftFee').value  = '0';
+  document.getElementById('ftNote').value = '';
+  openM('mTx');
+}
 
 async function submitTx() {
-  const b = { symbol:gv('ftSym'), type:gv('ftType'), date:gv('ftDate'), volume:+gv('ftVol'), price:+gv('ftPx'), fee:+(gv('ftFee')||0), note:gv('ftNote') };
-  if (!b.date||!b.volume||!b.price) { toast('⚠️ กรอกข้อมูลให้ครบ'); return; }
+  const sym    = gv('ftSym').trim();
+  const type   = gv('ftType');
+  const date   = gv('ftDate');
+  const volume = +gv('ftVol');
+  const price  = +gv('ftPx');
+  const fee    = +(gv('ftFee')||0);
+  const note   = gv('ftNote');
+
+  if (!sym)    { toast('⚠️ เลือกหุ้น/คริปโต'); return; }
+  if (!date)   { toast('⚠️ เลือกวันที่'); return; }
+  if (!volume || volume <= 0) { toast('⚠️ ใส่จำนวน'); return; }
+  if (!price  || price <= 0)  { toast('⚠️ ใส่ราคา'); return; }
+
   load('กำลังบันทึก...');
   try {
+    const b = { symbol:sym, type, date, volume, price, fee, note };
     const r = await api('addTx', b);
-    D.transactions.push({ ...b, id:r.id }); save();
-    closeM('mTx'); renderAll(); toast(`✅ บันทึก ${b.type} ${b.symbol}`);
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+    D.transactions.push({ ...b, id: r.id }); save();
+    closeM('mTx'); renderAll();
+    toast(`✅ บันทึก ${type} ${sym} จำนวน ${volume} @ ฿${price}`);
+  } catch(e) { toast('❌ ' + e.message); } finally { unload(); }
 }
 async function delTx(id) {
   if (!confirm('ลบรายการนี้?')) return; load();
@@ -967,17 +998,29 @@ async function delTx(id) {
 // ══════════════════════════════════════════════
 //  ACTIONS — EQUITY
 // ══════════════════════════════════════════════
+function openAddEq() {
+  document.getElementById('feDate').value  = today();
+  document.getElementById('feAmt').value   = '';
+  document.getElementById('feNote').value  = '';
+  openM('mEq');
+}
 async function submitEq() {
-  const b = { date:gv('feDate'), amount:+gv('feAmt'), note:gv('feNote') };
-  if (!b.date||!b.amount) { toast('⚠️ กรอกข้อมูลให้ครบ'); return; }
-  load();
+  const date   = gv('feDate');
+  const amount = +gv('feAmt');
+  const note   = gv('feNote');
+  if (!date)            { toast('⚠️ เลือกวันที่'); return; }
+  if (!amount || amount <= 0) { toast('⚠️ ใส่จำนวนเงิน'); return; }
+  load('กำลังบันทึก...');
   try {
-    const r = await api('addEquity',b); D.equity.push({...b,id:r.id}); save();
-    closeM('mEq'); renderEq(); renderDash(); toast('✅ บันทึกสำเร็จ');
+    const b = { date, amount, note };
+    const r = await api('addEquity', b);
+    D.equity.push({ ...b, id:r.id }); save();
+    closeM('mEq'); renderEq(); renderDash();
+    toast('✅ บันทึก DCA ฿' + amount.toLocaleString() + ' สำเร็จ');
   } catch(e) { toast('❌ '+e.message); } finally { unload(); }
 }
 async function delEq(id) {
-  if (!confirm('ลบ?')) return; load();
+  if (!confirm('ลบรายการนี้?')) return; load();
   try { await api('deleteEquity',{id}); D.equity=D.equity.filter(e=>e.id!==id); save(); renderEq(); renderDash(); }
   catch(e) { toast('❌ '+e.message); } finally { unload(); }
 }
@@ -985,39 +1028,99 @@ async function delEq(id) {
 // ══════════════════════════════════════════════
 //  ACTIONS — DIVIDEND
 // ══════════════════════════════════════════════
+function openAddDiv() {
+  fillSelects();
+  document.getElementById('fdDate').value  = today();
+  document.getElementById('fdAmt').value   = '';
+  document.getElementById('fdNote').value  = '';
+  openM('mDiv');
+}
 async function submitDiv() {
-  const b = { symbol:gv('fdSym'), date:gv('fdDate'), amount:+gv('fdAmt'), note:gv('fdNote') };
-  if (!b.date||!b.amount) { toast('⚠️ กรอกข้อมูลให้ครบ'); return; }
-  load();
+  const symbol = gv('fdSym').trim();
+  const date   = gv('fdDate');
+  const amount = +gv('fdAmt');
+  const note   = gv('fdNote');
+  if (!symbol)          { toast('⚠️ เลือกหุ้น'); return; }
+  if (!date)            { toast('⚠️ เลือกวันที่'); return; }
+  if (!amount || amount <= 0) { toast('⚠️ ใส่จำนวนเงิน'); return; }
+  load('กำลังบันทึก...');
   try {
-    const r = await api('addDividend',b); D.dividends.push({...b,id:r.id}); save();
-    closeM('mDiv'); renderDiv(); renderDash(); toast('✅ บันทึกปันผลสำเร็จ');
+    const b = { symbol, date, amount, note };
+    const r = await api('addDividend', b);
+    D.dividends.push({ ...b, id:r.id }); save();
+    closeM('mDiv'); renderDiv(); renderDash();
+    toast('✅ บันทึกปันผล '+symbol+' ฿'+amount+' สำเร็จ');
   } catch(e) { toast('❌ '+e.message); } finally { unload(); }
 }
 async function delDiv(id) {
-  if (!confirm('ลบ?')) return; load();
+  if (!confirm('ลบรายการนี้?')) return; load();
   try { await api('deleteDividend',{id}); D.dividends=D.dividends.filter(d=>d.id!==id); save(); renderDiv(); renderDash(); }
   catch(e) { toast('❌ '+e.message); } finally { unload(); }
 }
 
 // ══════════════════════════════════════════════
-//  ACTIONS — STOCKS
+//  ACTIONS — STOCKS & ALERTS
 // ══════════════════════════════════════════════
+function openAddStock() {
+  document.getElementById('nsSym').value  = '';
+  document.getElementById('nsName').value = '';
+  openM('mStock');
+}
 async function submitStock() {
   const sym  = gv('nsSym').trim().toUpperCase();
-  const name = gv('nsName').trim();
+  const name = gv('nsName').trim() || sym;
   const type = gv('nsType');
-  if (!sym) { toast('⚠️ ใส่ชื่อย่อหุ้น'); return; }
-  if (D.stocks.find(s => s.symbol===sym)) { toast('⚠️ '+sym+' มีอยู่แล้ว'); return; }
+  if (!sym) { toast('⚠️ ใส่ชื่อย่อ เช่น PTT, BTC'); return; }
+  if (D.stocks.find(s => s.symbol === sym)) { toast(`⚠️ ${sym} มีอยู่แล้ว`); return; }
   const color = (type==='crypto' ? CCOLOR[sym] : null) || PAL[D.stocks.length % PAL.length];
-  load();
+  load('กำลังเพิ่ม '+sym+'...');
   try {
-    const r = await api('addStock',{symbol:sym,name,color,type});
-    D.stocks.push({symbol:sym,name,color,type,id:r.id}); save();
+    const r = await api('addStock',{symbol:sym, name, color, type});
+    D.stocks.push({symbol:sym, name, color, type, id:r.id}); save();
     closeM('mStock');
-    // ถ้าเป็น crypto ดึงราคาทันที
-    if (type === 'crypto') { await api('fetchCrypto',{}); await pull(); }
-    renderAll(); toast(`✅ เพิ่ม ${sym} สำเร็จ`);
+    if (type === 'crypto') { await api('fetchCrypto',{}); await refreshAll(); }
+    else { fillSelects(); renderAll(); }
+    toast(`✅ เพิ่ม ${sym} (${type==='crypto'?'คริปโต':'หุ้น'}) สำเร็จ`);
+  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+}
+
+function openAddAlert() {
+  document.getElementById('alSym').value   = '';
+  document.getElementById('alPrice').value = '';
+  document.getElementById('alNote').value  = '';
+  openM('mAlert');
+}
+function quickAlert(sym) {
+  document.getElementById('alSym').value   = sym;
+  document.getElementById('alPrice').value = '';
+  document.getElementById('alNote').value  = '';
+  openM('mAlert');
+}
+async function submitAlert() {
+  const sym   = gv('alSym').trim().toUpperCase();
+  const cond  = gv('alCond');
+  const price = +gv('alPrice');
+  const note  = gv('alNote');
+  if (!sym)   { toast('⚠️ ใส่ symbol เช่น UPOIC, BTC'); return; }
+  if (!price || price <= 0) { toast('⚠️ ใส่ราคาเป้าหมาย'); return; }
+  load('กำลังบันทึก alert...');
+  try {
+    const r = await api('addAlert',{symbol:sym, condition:cond, targetPrice:price, note});
+    D.alerts.push({id:r.id, symbol:sym, condition:cond, targetPrice:price, note, active:true, triggeredAt:'', createdAt:new Date().toISOString()});
+    save(); closeM('mAlert'); renderAlerts();
+    toast(`✅ ตั้งเป้า ${sym} ${cond==='above'?'≥':'≤'} ฿${price} — LINE แจ้งเตือนอัตโนมัติ`);
+  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+}
+async function delAlert(id) {
+  if (!confirm('ลบ alert นี้?')) return; load();
+  try { await api('deleteAlert',{id}); D.alerts=D.alerts.filter(a=>a.id!==id); save(); renderAlerts(); }
+  catch(e) { toast('❌ '+e.message); } finally { unload(); }
+}
+async function testLine() {
+  load('ส่ง Line Notify...');
+  try {
+    const r = await api('testLine',{});
+    toast(r.sent ? '✅ LINE Notify ส่งสำเร็จ! เช็คมือถือได้เลย 📱' : '❌ ส่งไม่ได้ — ตรวจสอบ LINE_NOTIFY_TOKEN ใน Script Properties');
   } catch(e) { toast('❌ '+e.message); } finally { unload(); }
 }
 
