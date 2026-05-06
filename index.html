@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#0b0f1a;--ink2:#111827;--ink3:#1c2539;
+  --bg:#0b0f1a;--bg2:#111827;--bg3:#1c2539;
   --card:#1e2740;--card2:#232d47;
   --rim:#2e3d5c;--rim2:#3d5080;
   --txt:#dce7f8;--txt2:#7b97c4;--txt3:#4a617f;
@@ -16,799 +16,718 @@
   --rose:#ef4444;--rose2:#dc2626;
   --amber:#f59e0b;--gold:#fcd34d;
   --violet:#8b5cf6;
-  --font:'Sarabun',sans-serif;
-  --mono:'IBM Plex Mono',monospace;
-  --rad:12px;
+  --font:'Sarabun',sans-serif;--mono:'IBM Plex Mono',monospace;--r:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--ink);color:var(--txt);min-height:100vh;overflow-x:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--ink2)}
+::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--rim2);border-radius:3px}
 
 /* SETUP */
-#setupScreen{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
-.setup-box{background:var(--card);border:1px solid var(--rim);border-radius:20px;padding:28px;max-width:540px;width:100%}
-.setup-logo{font-size:30px;text-align:center;margin-bottom:4px}
-.setup-title{font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}
-.setup-sub{font-size:12.5px;color:var(--txt2);text-align:center;margin-bottom:22px}
-.steps{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
-.step{display:flex;gap:11px;background:var(--ink2);border:1px solid var(--rim);border-radius:10px;padding:12px}
-.sn{width:24px;height:24px;border-radius:50%;background:var(--sky);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.sb-title{font-size:13px;font-weight:700;margin-bottom:2px}
-.sb-desc{font-size:11.5px;color:var(--txt2);line-height:1.6}
-code{font-family:var(--mono);font-size:11px;background:var(--ink);padding:2px 5px;border-radius:4px;color:var(--gold)}
-.url-row{display:flex;gap:7px}
-.url-row input{flex:1}
+#setup{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.sbox{background:var(--card);border:1px solid var(--rim);border-radius:18px;padding:28px;max-width:520px;width:100%}
+.slogo{font-size:28px;text-align:center;margin-bottom:4px}
+.stitle{font-size:20px;font-weight:800;text-align:center;margin-bottom:3px}
+.ssub{font-size:12px;color:var(--txt2);text-align:center;margin-bottom:20px}
+.steps{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.step{display:flex;gap:10px;background:var(--bg2);border:1px solid var(--rim);border-radius:9px;padding:11px}
+.sn{width:22px;height:22px;border-radius:50%;background:var(--sky);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.stxt b{font-size:13px;display:block;margin-bottom:2px}
+.stxt p{font-size:11.5px;color:var(--txt2);line-height:1.6}
+code{font-family:var(--mono);font-size:11px;background:var(--bg);padding:1px 5px;border-radius:3px;color:var(--gold)}
 
 /* LOADER */
-#loader{position:fixed;inset:0;background:rgba(11,15,26,.88);z-index:8000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;backdrop-filter:blur(6px)}
+#loader{position:fixed;inset:0;background:rgba(11,15,26,.9);z-index:8000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;backdrop-filter:blur(4px)}
 #loader.on{display:flex}
-.lring{width:40px;height:40px;border:3px solid var(--rim);border-top-color:var(--sky);border-radius:50%;animation:spin .8s linear infinite}
+.ring{width:38px;height:38px;border:3px solid var(--rim);border-top-color:var(--sky);border-radius:50%;animation:spin .7s linear infinite}
 #lmsg{font-size:13px;color:var(--txt2)}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.toast{position:fixed;bottom:20px;right:16px;background:var(--card2);border:1px solid var(--rim2);border-radius:10px;padding:11px 16px;font-size:13px;z-index:7000;display:none;max-width:300px;box-shadow:0 8px 30px rgba(0,0,0,.6);animation:tst .2s ease}
+.toast{position:fixed;bottom:18px;right:14px;background:var(--card2);border:1px solid var(--rim2);border-radius:9px;padding:10px 15px;font-size:13px;z-index:7000;display:none;max-width:300px;box-shadow:0 8px 28px rgba(0,0,0,.6);animation:tin .18s ease}
 .toast.on{display:block}
-@keyframes tst{from{opacity:0;transform:translateY(8px)}}
+@keyframes tin{from{opacity:0;transform:translateY(7px)}}
 
 /* APP */
 #app{display:none}
 #app.on{display:block}
-
-.hdr{height:54px;background:var(--ink2);border-bottom:1px solid var(--rim);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
-.logo{font-size:16px;font-weight:800}
+.hdr{height:52px;background:var(--bg2);border-bottom:1px solid var(--rim);display:flex;align-items:center;justify-content:space-between;padding:0 15px;position:sticky;top:0;z-index:100}
+.logo{font-size:15px;font-weight:800}
 .logo em{font-style:normal;color:var(--sky)}
-.sync-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt3)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite;flex-shrink:0}
+.srow{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--txt3)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.tl{font-family:var(--mono);font-size:11px}
-
-.nav{display:flex;background:var(--ink2);border-bottom:1px solid var(--rim);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tl{font-family:var(--mono);font-size:10.5px}
+.nav{display:flex;background:var(--bg2);border-bottom:1px solid var(--rim);overflow-x:auto;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
-.nb{flex-shrink:0;padding:12px 15px;font-size:12.5px;font-weight:600;color:var(--txt3);cursor:pointer;border-bottom:2px solid transparent;transition:all .17s;white-space:nowrap;font-family:var(--font);background:none;border-top:none;border-left:none;border-right:none}
+.nb{flex-shrink:0;padding:11px 14px;font-size:12px;font-weight:600;color:var(--txt3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;font-family:var(--font);background:none;border-top:none;border-left:none;border-right:none}
 .nb:hover{color:var(--txt2)}
 .nb.on{color:var(--sky);border-bottom-color:var(--sky)}
-
-.wrap{padding:16px;max-width:1380px;margin:0 auto}
+.wrap{padding:15px;max-width:1380px;margin:0 auto}
 .pg{display:none}
 .pg.on{display:block}
 
 /* KPI */
-.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:11px;margin-bottom:18px}
-.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:13px 14px;transition:border-color .2s,transform .2s;position:relative;min-width:0}
+.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--r);padding:12px 13px;position:relative;min-width:0;transition:border-color .2s,transform .2s}
 .kpi:hover{border-color:var(--rim2);transform:translateY(-2px)}
-.kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.015),transparent);pointer-events:none;border-radius:var(--rad)}
-.kl{font-size:9.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700}
-.kv{font-size:17px;font-weight:800;font-family:var(--mono);line-height:1.2}
-.ks{font-size:10.5px;margin-top:4px;color:var(--txt3)}
-.k-b{border-color:rgba(59,130,246,.3);background:linear-gradient(135deg,var(--card),rgba(59,130,246,.05))}
-.k-g{border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,var(--card),rgba(16,185,129,.05))}
-.k-r{border-color:rgba(239,68,68,.3);background:linear-gradient(135deg,var(--card),rgba(239,68,68,.05))}
-.k-y{border-color:rgba(252,211,77,.3);background:linear-gradient(135deg,var(--card),rgba(252,211,77,.04))}
+.kl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:700}
+.kv{font-size:15px;font-weight:800;font-family:var(--mono);line-height:1.2}
+.ks{font-size:10px;margin-top:4px;color:var(--txt3)}
+.kb{border-color:rgba(59,130,246,.3);background:linear-gradient(135deg,var(--card),rgba(59,130,246,.05))}
+.kg2{border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,var(--card),rgba(16,185,129,.05))}
+.kr{border-color:rgba(239,68,68,.3);background:linear-gradient(135deg,var(--card),rgba(239,68,68,.05))}
+.ky{border-color:rgba(252,211,77,.3);background:linear-gradient(135deg,var(--card),rgba(252,211,77,.04))}
 
-/* SEC */
-.sec{font-size:10.5px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+/* SECTION */
+.sec{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:2px;margin-bottom:11px;display:flex;align-items:center;gap:8px}
 .sec::after{content:'';flex:1;height:1px;background:var(--rim)}
 
 /* TABLE */
-.tw{overflow-x:auto;border:1px solid var(--rim);border-radius:var(--rad);margin-bottom:18px}
-table{width:100%;border-collapse:collapse;font-size:12.5px}
-thead{background:var(--ink2)}
-thead th{padding:10px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:var(--txt3);font-weight:700;white-space:nowrap;border-bottom:1px solid var(--rim)}
-tbody tr{border-bottom:1px solid var(--rim);transition:background .12s}
+.tw{overflow-x:auto;border:1px solid var(--rim);border-radius:var(--r);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead{background:var(--bg2)}
+th{padding:9px 11px;text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt3);font-weight:700;white-space:nowrap;border-bottom:1px solid var(--rim)}
+tbody tr{border-bottom:1px solid var(--rim);transition:background .1s}
 tbody tr:last-child{border:none}
-tbody tr:hover{background:rgba(255,255,255,.022)}
-tbody td{padding:9px 12px;color:var(--txt2);font-family:var(--mono);font-size:12px;white-space:nowrap}
-tbody td:first-child{font-family:var(--font);color:var(--txt)}
-.db{background:none;border:none;color:var(--rose);cursor:pointer;font-size:13px;opacity:.55;transition:opacity .12s}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+td{padding:8px 11px;color:var(--txt2);font-family:var(--mono);font-size:11.5px;white-space:nowrap}
+td:first-child{font-family:var(--font);color:var(--txt)}
+.db{background:none;border:none;color:var(--rose);cursor:pointer;font-size:13px;opacity:.5;transition:opacity .1s}
 .db:hover{opacity:1}
 
 /* STOCK CARDS */
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:18px}
-.sc{background:var(--card);border:1px solid var(--rim);border-radius:14px;overflow:hidden;transition:all .22s}
-.sc:hover{border-color:var(--rim2);transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,.4)}
-.sc-hd{padding:14px 16px 11px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--rim)}
-.sym{font-size:18px;font-weight:800;font-family:var(--mono)}
-.snm{font-size:10.5px;color:var(--txt3);margin-top:2px}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px;margin-bottom:16px}
+.sc{background:var(--card);border:1px solid var(--rim);border-radius:13px;overflow:hidden;transition:all .2s}
+.sc:hover{border-color:var(--rim2);transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.4)}
+.sch{padding:13px 15px 10px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--rim)}
+.sym{font-size:17px;font-weight:800;font-family:var(--mono)}
+.snm{font-size:10px;color:var(--txt3);margin-top:2px}
 .pb{text-align:right}
-.mp{font-size:19px;font-weight:800;font-family:var(--mono)}
-.cp{font-size:11px;padding:2px 7px;border-radius:20px;font-family:var(--mono);margin-top:3px;display:inline-block;font-weight:600}
+.mp{font-size:18px;font-weight:800;font-family:var(--mono)}
+.cp{font-size:10.5px;padding:2px 6px;border-radius:20px;font-family:var(--mono);margin-top:2px;display:inline-block;font-weight:600}
 .up{background:rgba(16,185,129,.15);color:var(--jade)}
 .dn{background:rgba(239,68,68,.15);color:var(--rose)}
 .fl{background:rgba(123,154,196,.1);color:var(--txt2)}
-.sc-bd{padding:12px 16px}
-.sr{display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px}
+.scb{padding:11px 15px}
+.sr{display:flex;justify-content:space-between;padding:3.5px 0;font-size:12px}
 .sl{color:var(--txt3)}
 .sv{font-family:var(--mono);font-weight:600}
-.bw{margin-top:8px}
-.bl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--txt3);margin-bottom:4px}
-.bb{background:var(--ink);border-radius:4px;height:5px;overflow:hidden}
-.bf{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.bg{background:linear-gradient(90deg,var(--jade2),var(--jade))}
-.br2{background:linear-gradient(90deg,var(--rose2),var(--rose))}
-.sc-ft{padding:9px 16px;background:rgba(0,0,0,.18);display:flex;gap:6px;flex-wrap:wrap}
+.bw{margin-top:7px}
+.bl{display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);margin-bottom:3px}
+.bb{background:var(--bg);border-radius:4px;height:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bfg{background:linear-gradient(90deg,var(--jade2),var(--jade))}
+.bfr{background:linear-gradient(90deg,var(--rose2),var(--rose))}
+.scf{padding:8px 15px;background:rgba(0,0,0,.18);display:flex;gap:5px;flex-wrap:wrap}
 
 /* ALLOC */
-.al{display:flex;flex-direction:column;gap:10px}
-.ai-inf{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.alloc-item{margin-bottom:10px}
+.alloc-inf{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px}
 
 /* CHART */
-.cc{background:var(--card);border:1px solid var(--rim);border-radius:var(--rad);padding:16px;margin-bottom:18px}
-canvas{width:100%!important}
+.cc{background:var(--card);border:1px solid var(--rim);border-radius:var(--r);padding:15px;margin-bottom:16px}
 
 /* BUTTONS */
-.btn{padding:9px 18px;border-radius:8px;border:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .14s}
-.btn-b{background:var(--sky);color:#fff}
-.btn-b:hover{background:var(--sky2)}
-.btn-g{background:var(--card2);color:var(--txt2);border:1px solid var(--rim2)}
-.btn-g:hover{border-color:var(--sky);color:var(--sky)}
-.btn-d{background:var(--rose);color:#fff}
-.btn-d:hover{background:var(--rose2)}
-.btn-line{background:#06c755;color:#fff}
-.btn-line:hover{background:#05a848}
-.bs{padding:5px 10px;font-size:11.5px;border-radius:6px;border:1px solid var(--rim2);background:var(--card2);color:var(--txt2);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .14s}
+.btn{padding:8px 16px;border-radius:8px;border:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .13s}
+.btb{background:var(--sky);color:#fff}
+.btb:hover{background:var(--sky2)}
+.btg{background:var(--card2);color:var(--txt2);border:1px solid var(--rim2)}
+.btg:hover{border-color:var(--sky);color:var(--sky)}
+.btd{background:var(--rose);color:#fff}
+.btd:hover{background:var(--rose2)}
+.btl{background:#06c755;color:#fff}
+.btl:hover{background:#05a848}
+.bs{padding:4px 9px;font-size:11px;border-radius:6px;border:1px solid var(--rim2);background:var(--card2);color:var(--txt2);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .13s}
 .bs:hover{border-color:var(--sky);color:var(--sky)}
-.bs.buy{background:rgba(16,185,129,.1);color:var(--jade);border-color:rgba(16,185,129,.3)}
-.bs.sell{background:rgba(239,68,68,.08);color:var(--rose);border-color:rgba(239,68,68,.3)}
-.bs.info{background:rgba(59,130,246,.08);color:var(--sky);border-color:rgba(59,130,246,.3)}
-.bs.alert{background:rgba(245,158,11,.08);color:var(--amber);border-color:rgba(245,158,11,.3)}
+.bsbuy{background:rgba(16,185,129,.1);color:var(--jade);border-color:rgba(16,185,129,.3)}
+.bssell{background:rgba(239,68,68,.08);color:var(--rose);border-color:rgba(239,68,68,.3)}
+.bsalert{background:rgba(245,158,11,.08);color:var(--amber);border-color:rgba(245,158,11,.3)}
+.bsinfo{background:rgba(59,130,246,.08);color:var(--sky);border-color:rgba(59,130,246,.3)}
 
 /* MODAL */
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:3000;display:none;align-items:center;justify-content:center;padding:15px;backdrop-filter:blur(5px)}
 .ov.on{display:flex}
-.modal{background:var(--card);border:1px solid var(--rim2);border-radius:18px;width:100%;max-width:450px;max-height:92vh;overflow-y:auto;animation:min .22s ease}
-@keyframes min{from{transform:translateY(22px);opacity:0}}
-.mhd{padding:18px 20px 12px;border-bottom:1px solid var(--rim);display:flex;justify-content:space-between;align-items:center}
-.mttl{font-size:15px;font-weight:700}
-.mcl{width:26px;height:26px;border:1px solid var(--rim2);border-radius:7px;background:transparent;color:var(--txt2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .12s}
-.mcl:hover{background:var(--ink2);color:var(--txt)}
-.mbdy{padding:18px 20px}
-.fg{margin-bottom:13px}
-label{display:block;font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:5px;font-weight:700}
-input,select,textarea{width:100%;padding:9px 12px;background:var(--ink2);border:1px solid var(--rim);border-radius:8px;color:var(--txt);font-family:var(--font);font-size:13.5px;outline:none;transition:border-color .14s;-webkit-appearance:none}
+.modal{background:var(--card);border:1px solid var(--rim2);border-radius:16px;width:100%;max-width:440px;max-height:92vh;overflow-y:auto;animation:mIn .2s ease}
+@keyframes mIn{from{transform:translateY(20px);opacity:0}}
+.mhd{padding:16px 18px 11px;border-bottom:1px solid var(--rim);display:flex;justify-content:space-between;align-items:center}
+.mttl{font-size:14px;font-weight:700}
+.mcl{width:25px;height:25px;border:1px solid var(--rim2);border-radius:6px;background:transparent;color:var(--txt2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .1s}
+.mcl:hover{background:var(--bg2);color:var(--txt)}
+.mbdy{padding:16px 18px}
+.fg{margin-bottom:12px}
+label{display:block;font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:700}
+input,select,textarea{width:100%;padding:8px 11px;background:var(--bg2);border:1px solid var(--rim);border-radius:7px;color:var(--txt);font-family:var(--font);font-size:13px;outline:none;transition:border-color .13s;-webkit-appearance:none}
 input:focus,select:focus{border-color:var(--sky)}
 input[type=number]{font-family:var(--mono)}
-select option{background:var(--ink2)}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mr{display:flex;gap:8px;margin-top:4px}
+select option{background:var(--bg2)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mr{display:flex;gap:8px;margin-top:6px}
 .mr .btn{flex:1}
 
 /* AI */
-.aic{background:var(--card);border:1px solid var(--rim);border-radius:13px;padding:16px;margin-bottom:12px}
-.aihd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px}
-.aisym{font-size:15px;font-weight:800}
-.aimeta{font-size:11px;color:var(--txt3);margin-top:3px}
-.badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.4px}
-.bb2{background:rgba(16,185,129,.15);color:var(--jade);border:1px solid rgba(16,185,129,.3)}
-.bs2{background:rgba(239,68,68,.15);color:var(--rose);border:1px solid rgba(239,68,68,.3)}
-.bh{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.aic{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:15px;margin-bottom:11px}
+.aihd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;flex-wrap:wrap;gap:7px}
+.aisym{font-size:14px;font-weight:800}
+.aimeta{font-size:10.5px;color:var(--txt3);margin-top:2px}
+.badge{padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:700;letter-spacing:.4px}
 .bai{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
-.ait{font-size:13.5px;line-height:1.85;color:var(--txt2)}
+.bbuy{background:rgba(16,185,129,.15);color:var(--jade);border:1px solid rgba(16,185,129,.3)}
+.bsell{background:rgba(239,68,68,.15);color:var(--rose);border:1px solid rgba(239,68,68,.3)}
+.bhold{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.ait{font-size:13px;line-height:1.85;color:var(--txt2)}
 .ait strong{color:var(--txt)}
-.ldg{display:flex;align-items:center;gap:9px;color:var(--txt3);font-size:12.5px}
-.sp{width:15px;height:15px;border:2px solid var(--rim2);border-top-color:var(--sky);border-radius:50%;animation:spin .7s linear infinite}
-
-/* TAG */
-.tag{padding:2px 6px;border-radius:4px;font-size:11px;font-family:var(--mono);font-weight:700}
-.tb{background:rgba(16,185,129,.12);color:var(--jade)}
-.ts{background:rgba(239,68,68,.1);color:var(--rose)}
+.ldg{display:flex;align-items:center;gap:8px;color:var(--txt3);font-size:12px}
+.sp{width:14px;height:14px;border:2px solid var(--rim2);border-top-color:var(--sky);border-radius:50%;animation:spin .6s linear infinite}
 
 /* INFO BOX */
-.info-box{border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;line-height:1.8}
-.info-blue{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.22);color:var(--txt2)}
-.info-amber{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.22);color:var(--txt2)}
-.info-green{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.22);color:var(--txt2)}
+.ibox{border-radius:9px;padding:11px 13px;margin-bottom:14px;font-size:12px;line-height:1.8}
+.iblue{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);color:var(--txt2)}
+.iamber{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);color:var(--txt2)}
+.igreen{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);color:var(--txt2)}
 
-/* PAGE HEADER */
-.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.ph-title{margin:0}
-.ph-actions{display:flex;gap:7px;flex-wrap:wrap}
+/* TAGS */
+.tag{padding:2px 6px;border-radius:4px;font-size:10.5px;font-family:var(--mono);font-weight:700}
+.tbuy{background:rgba(16,185,129,.12);color:var(--jade)}
+.tsell{background:rgba(239,68,68,.1);color:var(--rose)}
+
+/* PH = Page Header */
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:9px}
+.pha{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 
 @media(max-width:600px){
-  .wrap{padding:11px}
-  .kgrid{grid-template-columns:repeat(2,1fr);gap:8px}
-  .kpi{padding:11px 12px}
-  .kl{font-size:9px;letter-spacing:.5px}
-  .kv{font-size:15px}
-  .sgrid{grid-template-columns:1fr}
+  .wrap{padding:10px}
+  .kg{grid-template-columns:repeat(2,1fr);gap:7px}
+  .kpi{padding:10px 11px}
+  .kl{font-size:8.5px}
+  .kv{font-size:13px}
+  .sg{grid-template-columns:1fr}
   .fr{grid-template-columns:1fr}
   .hdr{padding:0 10px}
-  .logo{font-size:14px}
-  .nb{padding:10px 11px;font-size:11.5px}
+  .nb{padding:9px 10px;font-size:11.5px}
 }
-@media(max-width:380px){
-  .kv{font-size:13px}
-  .kpi{padding:10px 10px}
-}
-@media(min-width:900px){.kgrid{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:380px){.kv{font-size:12px}.kpi{padding:9px 9px}}
+@media(min-width:900px){.kg{grid-template-columns:repeat(6,1fr)}}
 </style>
 </head>
 <body>
 
-<!-- ═══ SETUP ═══ -->
-<div id="setupScreen">
-  <div class="setup-box">
-    <div class="setup-logo">📈</div>
-    <div class="setup-title">ThaiPortfolio</div>
-    <div class="setup-sub">หุ้น + คริปโต + แจ้งเตือน Line — ข้อมูล Sync ทุกอุปกรณ์ผ่าน Google Sheets</div>
-    <div class="steps">
-      <div class="step"><div class="sn">1</div><div><div class="sb-title">สร้าง Google Sheets</div><div class="sb-desc">ไปที่ <a href="https://sheets.new" target="_blank" style="color:var(--sky)">sheets.new</a> → สร้าง Spreadsheet ใหม่</div></div></div>
-      <div class="step"><div class="sn">2</div><div><div class="sb-title">วาง Code.gs</div><div class="sb-desc"><code>Extensions</code> → <code>Apps Script</code> → วาง code จาก <code>Code.gs</code> → Save</div></div></div>
-      <div class="step"><div class="sn">3</div><div><div class="sb-title">Run firstTimeSetup</div><div class="sb-desc">dropdown เลือก <code>firstTimeSetup</code> → ▶ เรียกใช้ → อนุญาต permission</div></div></div>
-      <div class="step"><div class="sn">4</div><div><div class="sb-title">Deploy Web App</div><div class="sb-desc"><code>Deploy</code> → <code>New deployment</code> → Web app → Execute as: Me → Access: Anyone → คัดลอก URL</div></div></div>
+<!-- SETUP -->
+<div id="setup">
+<div class="sbox">
+  <div class="slogo">📈</div>
+  <div class="stitle">ThaiPortfolio</div>
+  <div class="ssub">หุ้น + คริปโต + แจ้งเตือน LINE — Sync ทุกอุปกรณ์</div>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div class="stxt"><b>สร้าง Google Sheets</b><p>ไปที่ <a href="https://sheets.new" target="_blank" style="color:var(--sky)">sheets.new</a> → สร้าง Spreadsheet ใหม่</p></div></div>
+    <div class="step"><div class="sn">2</div><div class="stxt"><b>วาง Code.gs</b><p><code>Extensions</code> → <code>Apps Script</code> → วาง Code.gs ทั้งหมด → Save</p></div></div>
+    <div class="step"><div class="sn">3</div><div class="stxt"><b>Run firstTimeSetup</b><p>dropdown เลือก <code>firstTimeSetup</code> → ▶ เรียกใช้ → อนุญาต</p></div></div>
+    <div class="step"><div class="sn">4</div><div class="stxt"><b>Deploy Web App</b><p><code>Deploy</code> → <code>New deployment</code> → Web app<br>Execute as: <b>Me</b> | Access: <b>Anyone</b> → คัดลอก URL</p></div></div>
+  </div>
+  <div class="fg">
+    <label>Apps Script Web App URL</label>
+    <div style="display:flex;gap:7px">
+      <input type="url" id="setupUrl" placeholder="https://script.google.com/macros/s/…/exec">
+      <button class="btn btb" onclick="doConnect()">เชื่อมต่อ</button>
     </div>
-    <div class="fg">
-      <label>Apps Script Web App URL</label>
-      <div class="url-row">
-        <input type="url" id="setupUrl" placeholder="https://script.google.com/macros/s/…/exec">
-        <button class="btn btn-b" onclick="connectAndSeed()">เชื่อมต่อ</button>
+  </div>
+  <div style="font-size:11px;color:var(--txt3);margin-top:5px">⚡ import ข้อมูลประวัติทั้งหมดจาก Excel อัตโนมัติครั้งแรก</div>
+</div>
+</div>
+
+<!-- LOADER -->
+<div id="loader"><div class="ring"></div><div id="lmsg">กำลังโหลด...</div></div>
+
+<!-- APP -->
+<div id="app">
+<div class="hdr">
+  <div class="logo">📈 <em>Thai</em>Portfolio</div>
+  <div class="srow">
+    <div class="dot" id="sdot"></div>
+    <span id="slbl">Synced</span>
+    <span class="tl" id="stm">—</span>
+    <button class="bs" onclick="doRefresh()" style="padding:3px 8px;margin-left:2px">↻</button>
+  </div>
+</div>
+<nav class="nav">
+  <button class="nb on"  onclick="goPg('dash',this)">🏠 Dashboard</button>
+  <button class="nb"     onclick="goPg('port',this)">📊 พอร์ต</button>
+  <button class="nb"     onclick="goPg('txs',this)">📋 ซื้อ–ขาย</button>
+  <button class="nb"     onclick="goPg('dca',this)">💰 DCA</button>
+  <button class="nb"     onclick="goPg('div',this)">🎯 ปันผล</button>
+  <button class="nb"     onclick="goPg('alert',this)">🔔 แจ้งเตือน</button>
+  <button class="nb"     onclick="goPg('crypto',this)">₿ คริปโต</button>
+  <button class="nb"     onclick="goPg('ai',this)">🤖 AI</button>
+  <button class="nb"     onclick="goPg('cfg',this)">⚙️ ตั้งค่า</button>
+</nav>
+<div class="wrap">
+
+<!-- DASHBOARD -->
+<div class="pg on" id="pg-dash">
+  <div class="kg">
+    <div class="kpi kb"><div class="kl">เงิน DCA รวม</div><div class="kv" id="kdca" style="color:var(--sky)">–</div><div class="ks" id="kdca2">–</div></div>
+    <div class="kpi" id="kpnlcard"><div class="kl">กำไร/ขาดทุน</div><div class="kv" id="kpnl">–</div><div class="ks" id="kpnlp">–</div></div>
+    <div class="kpi kb"><div class="kl">มูลค่าพอร์ต</div><div class="kv" id="kval" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ราคาตลาด</div></div>
+    <div class="kpi ky"><div class="kl">ปันผลรวม</div><div class="kv" id="kdiv" style="color:var(--gold)">–</div><div class="ks" style="color:var(--txt3)">ทุกปี</div></div>
+    <div class="kpi kg2"><div class="kl">กำไร+ปันผล</div><div class="kv" id="ktot" style="color:var(--jade)">–</div><div class="ks" style="color:var(--txt3)">ผลตอบแทนรวม</div></div>
+    <div class="kpi kb"><div class="kl">หุ้น/คริปโต</div><div class="kv" id="kcnt" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ตัว</div></div>
+  </div>
+  <div class="sec">สัดส่วนพอร์ต</div>
+  <div class="cc" id="allocWrap"></div>
+  <div class="sec">สรุปหุ้น</div>
+  <div class="tw"><table><thead><tr><th>หุ้น</th><th>ต้นทุนเฉลี่ย</th><th>ราคาตลาด</th><th>ถือ</th><th>มูลค่า</th><th>ต้นทุนรวม</th><th>กำไร/ขาดทุน</th><th>%</th></tr></thead><tbody id="sumTbl"></tbody></table></div>
+  <div class="sec">กราฟสะสม DCA</div>
+  <div class="cc"><canvas id="eqChart" height="148"></canvas></div>
+</div>
+
+<!-- PORTFOLIO -->
+<div class="pg" id="pg-port">
+  <div class="ph"><div class="sec" style="margin:0">พอร์ตหุ้น</div>
+    <div class="pha">
+      <button class="btn btg" onclick="doFetchPrices()" style="font-size:12px;padding:7px 12px">🔄 อัพเดทราคา</button>
+      <button class="btn btb" onclick="openStockModal()" style="font-size:12px;padding:7px 12px">+ เพิ่มหุ้น</button>
+    </div>
+  </div>
+  <div class="sg" id="stockGrid"></div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div class="pg" id="pg-txs">
+  <div class="ph"><div class="sec" style="margin:0">รายการซื้อ–ขาย</div>
+    <div class="pha">
+      <select id="txFltr" onchange="renderTxs()" style="width:auto;padding:7px 10px;font-size:12px"><option value="">ทุกหุ้น</option></select>
+      <button class="btn btb" onclick="openTxModal(null,null)" style="font-size:12px;padding:7px 12px">+ บันทึก</button>
+    </div>
+  </div>
+  <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>ประเภท</th><th>จำนวน</th><th>ราคา/หุ้น</th><th>มูลค่า</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="txTbl"></tbody></table></div>
+</div>
+
+<!-- DCA -->
+<div class="pg" id="pg-dca">
+  <div class="ph"><div class="sec" style="margin:0">ประวัติโอนเงิน DCA</div>
+    <button class="btn btb" onclick="openEqModal()" style="font-size:12px;padding:7px 12px">+ เพิ่ม</button>
+  </div>
+  <div class="kg" style="max-width:460px">
+    <div class="kpi kb"><div class="kl">รวมทั้งหมด</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
+    <div class="kpi"><div class="kl">จำนวนครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="eqTbl"></tbody></table></div>
+</div>
+
+<!-- DIVIDEND -->
+<div class="pg" id="pg-div">
+  <div class="ph"><div class="sec" style="margin:0">เงินปันผล</div>
+    <button class="btn btb" onclick="openDivModal()" style="font-size:12px;padding:7px 12px">+ บันทึก</button>
+  </div>
+  <div class="kg" style="max-width:460px">
+    <div class="kpi ky"><div class="kl">รวมทั้งหมด</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
+    <div class="kpi kg2"><div class="kl">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="dvTbl"></tbody></table></div>
+</div>
+
+<!-- ALERTS -->
+<div class="pg" id="pg-alert">
+  <div class="ph">
+    <div><div class="sec" style="margin:0 0 3px">🔔 แจ้งเตือน LINE Notify</div>
+    <div style="font-size:11px;color:var(--txt3)">แจ้งเตือนอัตโนมัติผ่าน LINE ทุก 15 นาที</div></div>
+    <div class="pha">
+      <button class="btn btl" onclick="doTestLine()" style="font-size:12px;padding:7px 12px">🔔 ทดสอบ LINE</button>
+      <button class="btn btb" onclick="openAlertModal(null)" style="font-size:12px;padding:7px 12px">+ ตั้งเป้า</button>
+    </div>
+  </div>
+  <div class="ibox iblue" style="font-size:11.5px">
+    <b style="color:var(--sky)">⚙️ ตั้งค่า LINE Notify (ฟรี ครั้งเดียว)</b><br>
+    1. <a href="https://notify-bot.line.me/th/" target="_blank" style="color:var(--sky)">notify-bot.line.me</a> → เข้าสู่ระบบ → "สร้าง token" → เลือกห้องแชท<br>
+    2. Apps Script → ⚙️ Project Settings → Script properties → <code>LINE_NOTIFY_TOKEN</code> = token<br>
+    3. Deploy ใหม่ → กด "ทดสอบ LINE" → รอข้อความใน LINE ✅
+  </div>
+  <div class="tw"><table><thead><tr><th>#</th><th>หุ้น</th><th>เงื่อนไข</th><th>ราคาเป้า</th><th>ราคาปัจจุบัน</th><th>สถานะ</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="alertTbl"></tbody></table></div>
+</div>
+
+<!-- CRYPTO -->
+<div class="pg" id="pg-crypto">
+  <div class="ph">
+    <div><div class="sec" style="margin:0 0 3px">₿ ติดตามคริปโต (Bitkub)</div>
+    <div style="font-size:11px;color:var(--txt3)">อัพเดทจาก api.bitkub.com ทุก 15 นาที — ฟรี ไม่ต้อง API Key</div></div>
+    <button class="btn btb" onclick="doFetchCrypto()" style="font-size:12px;padding:7px 12px">🔄 อัพเดทราคา</button>
+  </div>
+  <div class="ibox igreen" style="font-size:11.5px">
+    <b style="color:var(--jade)">เพิ่ม Symbol:</b> BTC, ETH, XRP, DOGE, ADA, SOL, BNB, MATIC ฯลฯ (ตามที่ Bitkub รองรับ)
+  </div>
+  <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">
+    <input type="text" id="newCrypto" placeholder="เช่น BTC, ETH, XRP" style="width:190px;font-size:13px;text-transform:uppercase">
+    <button class="btn btb" onclick="addCrypto()" style="padding:8px 14px;font-size:13px">+ เพิ่ม</button>
+  </div>
+  <div class="kg" id="cryptoGrid"></div>
+  <div class="tw" style="margin-top:12px"><table><thead><tr><th>Symbol</th><th>ราคา (฿)</th><th>เปลี่ยน 24h</th><th>% 24h</th><th>สูง</th><th>ต่ำ</th><th>อัพเดท</th><th></th></tr></thead><tbody id="cryptoTbl"></tbody></table></div>
+</div>
+
+<!-- AI -->
+<div class="pg" id="pg-ai">
+  <div class="ph">
+    <div><div class="sec" style="margin:0 0 3px">🤖 AI วิเคราะห์ (Claude + Web Search)</div>
+    <div style="font-size:11px;color:var(--txt3)">วิเคราะห์จากข้อมูลพอร์ตจริง + ข่าวปัจจุบัน</div></div>
+    <button class="btn btb" id="aBtn" onclick="analyzeAll()">🔍 วิเคราะห์ทั้งหมด</button>
+  </div>
+  <div class="ibox iamber" style="font-size:11.5px">
+    <b style="color:var(--amber)">⚙️ ต้องตั้งค่า ANTHROPIC_API_KEY ก่อน</b><br>
+    <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--sky)">console.anthropic.com</a> → Create key → Apps Script → Script properties → <code>ANTHROPIC_API_KEY</code> = sk-ant-... → Deploy ใหม่
+  </div>
+  <div id="aiCards"></div>
+</div>
+
+<!-- CONFIG -->
+<div class="pg" id="pg-cfg">
+  <div class="sec">⚙️ ตั้งค่า</div>
+  <div class="cc">
+    <div class="fg"><label>Apps Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btb" onclick="saveUrl()">💾 บันทึก URL</button>
+      <button class="btn btg" onclick="doRefresh()">↻ Sync</button>
+      <button class="btn btd" onclick="clearCache()">🗑 Clear Cache</button>
+    </div>
+    <div style="border-top:1px solid var(--rim);padding-top:14px">
+      <div class="sec" style="margin-bottom:10px">อัพเดทราคา Manual</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn btb" onclick="doFetchPrices()" style="font-size:12px;padding:7px 12px">🔄 Yahoo Finance</button>
+        <button class="btn btb" onclick="doFetchCrypto()" style="font-size:12px;padding:7px 12px">🔄 Bitkub</button>
       </div>
+      <div id="manualPrices"></div>
     </div>
-    <div style="font-size:11px;color:var(--txt3);margin-top:6px">⚡ import ข้อมูลประวัติทั้งหมดจาก Excel เข้า Google Sheets อัตโนมัติ</div>
   </div>
 </div>
 
-<!-- ═══ LOADER ═══ -->
-<div id="loader"><div class="lring"></div><div id="lmsg">กำลังโหลด...</div></div>
-
-<!-- ═══ APP ═══ -->
-<div id="app">
-  <div class="hdr">
-    <div class="logo">📈 <em>Thai</em>Portfolio</div>
-    <div class="sync-row">
-      <div class="dot" id="sdot"></div>
-      <span id="slbl">Synced</span>
-      <span class="tl" id="stm">—</span>
-      <button class="bs" onclick="refreshAll()" style="padding:3px 8px;margin-left:2px" title="Sync">↻</button>
-    </div>
-  </div>
-  <nav class="nav">
-    <button class="nb on"  onclick="pg('dash',this)">🏠 Dashboard</button>
-    <button class="nb"     onclick="pg('port',this)">📊 พอร์ต</button>
-    <button class="nb"     onclick="pg('txs',this)">📋 ซื้อ–ขาย</button>
-    <button class="nb"     onclick="pg('eqp',this)">💰 DCA</button>
-    <button class="nb"     onclick="pg('div',this)">🎯 ปันผล</button>
-    <button class="nb"     onclick="pg('alert',this)">🔔 แจ้งเตือน</button>
-    <button class="nb"     onclick="pg('crypto',this)">₿ คริปโต</button>
-    <button class="nb"     onclick="pg('ai',this)">🤖 AI</button>
-    <button class="nb"     onclick="pg('cfg',this)">⚙️ ตั้งค่า</button>
-  </nav>
-
-  <div class="wrap">
-
-    <!-- ══ DASHBOARD ══ -->
-    <div class="pg on" id="pg-dash">
-      <div class="kgrid">
-        <div class="kpi k-b"><div class="kl">เงิน DCA รวม</div><div class="kv" id="k-eq" style="color:var(--sky)">–</div><div class="ks" id="k-eq-s">–</div></div>
-        <div class="kpi" id="k-pc"><div class="kl">กำไร/ขาดทุน</div><div class="kv" id="k-pnl">–</div><div class="ks" id="k-pp">–</div></div>
-        <div class="kpi k-b"><div class="kl">มูลค่าพอร์ต</div><div class="kv" id="k-pv" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ราคาตลาด</div></div>
-        <div class="kpi k-y"><div class="kl">ปันผลรวม</div><div class="kv" id="k-dv" style="color:var(--gold)">–</div><div class="ks" style="color:var(--txt3)">ทุกปี</div></div>
-        <div class="kpi k-g"><div class="kl">กำไร+ปันผล</div><div class="kv" id="k-tt" style="color:var(--jade)">–</div><div class="ks" style="color:var(--txt3)">ผลตอบแทนรวม</div></div>
-        <div class="kpi k-b"><div class="kl">หุ้น/คริปโต</div><div class="kv" id="k-cn" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ตัว</div></div>
-      </div>
-      <div class="sec">สัดส่วนพอร์ต</div>
-      <div class="cc"><div class="al" id="allocL"></div></div>
-      <div class="sec">สรุปหุ้น</div>
-      <div class="tw"><table><thead><tr><th>หุ้น</th><th>เฉลี่ย</th><th>ตลาด</th><th>ถือ</th><th>มูลค่า</th><th>ต้นทุน</th><th>กำไร/ขาดทุน</th><th>%</th></tr></thead><tbody id="sumTbl"></tbody></table></div>
-      <div class="sec">กราฟสะสมเงิน DCA</div>
-      <div class="cc"><canvas id="eqChart" height="150"></canvas></div>
-    </div>
-
-    <!-- ══ PORTFOLIO ══ -->
-    <div class="pg" id="pg-port">
-      <div class="ph">
-        <div class="sec ph-title">หุ้นในพอร์ต</div>
-        <div class="ph-actions">
-          <button class="btn btn-g" onclick="triggerFetchPrices()" style="font-size:12px;padding:7px 13px">🔄 อัพเดทราคา</button>
-          <button class="btn btn-b" onclick="openAddStock()" style="font-size:12px;padding:7px 13px">+ เพิ่มหุ้น</button>
-        </div>
-      </div>
-      <div class="sgrid" id="stockGrid"></div>
-    </div>
-
-    <!-- ══ TRANSACTIONS ══ -->
-    <div class="pg" id="pg-txs">
-      <div class="ph">
-        <div class="sec ph-title">รายการซื้อ–ขาย</div>
-        <div class="ph-actions">
-          <select id="txFltr" onchange="renderTxs()" style="width:auto;padding:7px 11px;font-size:12.5px"><option value="">ทุกหุ้น</option></select>
-          <button class="btn btn-b" onclick="openAddTx()" style="font-size:12px;padding:7px 13px">+ บันทึก</button>
-        </div>
-      </div>
-      <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>ประเภท</th><th>จำนวน</th><th>ราคา/หุ้น</th><th>มูลค่า</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="txTbl"></tbody></table></div>
-    </div>
-
-    <!-- ══ DCA ══ -->
-    <div class="pg" id="pg-eqp">
-      <div class="ph">
-        <div class="sec ph-title">ประวัติโอนเงิน DCA</div>
-        <button class="btn btn-b" onclick="openAddEq()" style="font-size:12px;padding:7px 13px">+ เพิ่ม</button>
-      </div>
-      <div class="kgrid" style="max-width:500px">
-        <div class="kpi k-b"><div class="kl">รวมทั้งหมด</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
-        <div class="kpi"><div class="kl">จำนวนครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
-      </div>
-      <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="eqTbl"></tbody></table></div>
-    </div>
-
-    <!-- ══ DIVIDEND ══ -->
-    <div class="pg" id="pg-div">
-      <div class="ph">
-        <div class="sec ph-title">เงินปันผล</div>
-        <button class="btn btn-b" onclick="openAddDiv()" style="font-size:12px;padding:7px 13px">+ บันทึก</button>
-      </div>
-      <div class="kgrid" style="max-width:500px">
-        <div class="kpi k-y"><div class="kl">รวมทั้งหมด</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
-        <div class="kpi k-g"><div class="kl">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
-      </div>
-      <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="dvTbl"></tbody></table></div>
-    </div>
-
-    <!-- ══ ALERTS ══ -->
-    <div class="pg" id="pg-alert">
-      <div class="ph">
-        <div>
-          <div class="sec ph-title" style="margin:0 0 4px">🔔 ราคาเป้าหมาย + แจ้งเตือน Line</div>
-          <div style="font-size:11.5px;color:var(--txt3)">แจ้งเตือนอัตโนมัติผ่าน LINE Notify ทุก 15 นาที</div>
-        </div>
-        <div class="ph-actions">
-          <button class="btn btn-line" onclick="testLine()" style="font-size:12px;padding:7px 13px">🔔 ทดสอบ Line</button>
-          <button class="btn btn-b" onclick="openAddAlert()" style="font-size:12px;padding:7px 13px">+ ตั้งเป้า</button>
-        </div>
-      </div>
-      <div class="info-blue">
-        <b style="color:var(--sky)">⚙️ ตั้งค่า LINE Notify (ฟรี ครั้งเดียว)</b><br>
-        1. ไปที่ <a href="https://notify-bot.line.me/th/" target="_blank" style="color:var(--sky)">notify-bot.line.me</a> → เข้าสู่ระบบ → "สร้าง token" → ตั้งชื่อ → เลือกห้องแชท<br>
-        2. Apps Script → ⚙️ Project Settings → Script properties → <code>LINE_NOTIFY_TOKEN</code> = token<br>
-        3. กด Deploy ใหม่ → กด "ทดสอบ Line" ด้านบน → รอ LINE เข้า ✅
-      </div>
-      <div class="tw"><table><thead><tr>
-        <th>#</th><th>หุ้น</th><th>เงื่อนไข</th><th>ราคาเป้า</th><th>ราคาปัจจุบัน</th><th>สถานะ</th><th>หมายเหตุ</th><th></th>
-      </tr></thead><tbody id="alertTbl"></tbody></table></div>
-    </div>
-
-    <!-- ══ CRYPTO ══ -->
-    <div class="pg" id="pg-crypto">
-      <div class="ph">
-        <div>
-          <div class="sec ph-title" style="margin:0 0 4px">₿ ติดตามคริปโต (Bitkub)</div>
-          <div style="font-size:11.5px;color:var(--txt3)">อัพเดทราคาจาก Bitkub API อัตโนมัติทุก 15 นาที</div>
-        </div>
-        <button class="btn btn-b" onclick="triggerFetchCrypto()" style="font-size:12px;padding:7px 13px">🔄 อัพเดทราคา</button>
-      </div>
-      <div class="info-green" style="font-size:12px">
-        <b style="color:var(--jade)">วิธีเพิ่มคริปโต:</b> ใส่ชื่อ symbol Bitkub (เช่น BTC, ETH, XRP, DOGE) แล้วกด + เพิ่ม<br>
-        ระบบจะดึงราคาจาก <code>api.bitkub.com</code> ฟรี ไม่ต้อง API Key
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-        <input type="text" id="newCryptoSym" placeholder="BTC, ETH, XRP, DOGE, ADA..." style="width:200px;padding:8px 12px;font-size:13px;text-transform:uppercase">
-        <button class="btn btn-b" onclick="addCryptoWatch()" style="padding:8px 14px;font-size:13px">+ เพิ่ม</button>
-      </div>
-      <div class="kgrid" id="cryptoGrid"></div>
-      <div class="tw" style="margin-top:12px"><table><thead><tr>
-        <th>Symbol</th><th>ราคา (฿)</th><th>เปลี่ยน 24h (฿)</th><th>% 24h</th><th>ปริมาณ</th><th>อัพเดท</th><th></th>
-      </tr></thead><tbody id="cryptoTbl"></tbody></table></div>
-    </div>
-
-    <!-- ══ AI ══ -->
-    <div class="pg" id="pg-ai">
-      <div class="ph">
-        <div>
-          <div class="sec ph-title" style="margin:0 0 4px">🤖 AI วิเคราะห์หุ้น (Claude + Web Search)</div>
-          <div style="font-size:11.5px;color:var(--txt3)">วิเคราะห์จากข้อมูลพอร์ตจริง + ข่าวล่าสุด ผ่าน Apps Script</div>
-        </div>
-        <button class="btn btn-b" id="aBtn" onclick="analyzeAll()">🔍 วิเคราะห์ทั้งหมด</button>
-      </div>
-      <div class="info-amber">
-        <b style="color:var(--amber)">⚙️ ต้องตั้งค่า ANTHROPIC_API_KEY ก่อน (ครั้งเดียว)</b><br>
-        1. ไปที่ <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--sky)">console.anthropic.com</a> → Create key<br>
-        2. Apps Script → ⚙️ Project Settings → Script properties → <code>ANTHROPIC_API_KEY</code> = sk-ant-...<br>
-        3. Deploy ใหม่ → กด "วิเคราะห์ทั้งหมด"
-      </div>
-      <div id="aiCards"></div>
-    </div>
-
-    <!-- ══ CONFIG ══ -->
-    <div class="pg" id="pg-cfg">
-      <div class="sec">⚙️ การตั้งค่า</div>
-      <div class="cc">
-        <div class="fg"><label>Apps Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
-          <button class="btn btn-b" onclick="saveUrl()">💾 บันทึก URL</button>
-          <button class="btn btn-g" onclick="refreshAll()">↻ Sync ข้อมูล</button>
-          <button class="btn btn-d" onclick="clearCache()">🗑 Clear Cache</button>
-        </div>
-        <div style="border-top:1px solid var(--rim);padding-top:16px">
-          <div class="sec" style="margin-bottom:12px">อัพเดทราคาหุ้น Manual</div>
-          <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-b" onclick="triggerFetchPrices()" style="font-size:12.5px;padding:8px 14px">🔄 Yahoo Finance (หุ้น)</button>
-            <button class="btn btn-b" onclick="triggerFetchCrypto()" style="font-size:12.5px;padding:8px 14px">🔄 Bitkub (คริปโต)</button>
-          </div>
-          <div id="priceIn"></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /wrap -->
+</div><!-- /wrap -->
 </div><!-- /app -->
 
-<!-- ═══ MODALS ═══ -->
+<!-- MODALS -->
+<!-- Transaction -->
 <div class="ov" id="mTx">
-  <div class="modal">
-    <div class="mhd"><div class="mttl">📋 บันทึกซื้อ–ขาย</div><button class="mcl" onclick="closeM('mTx')">✕</button></div>
-    <div class="mbdy">
-      <div class="fg"><label>หุ้น / คริปโต</label><select id="ftSym"></select></div>
-      <div class="fr">
-        <div class="fg"><label>ประเภท</label><select id="ftType"><option value="Buy">ซื้อ (Buy)</option><option value="Sell">ขาย (Sell)</option></select></div>
-        <div class="fg"><label>วันที่</label><input type="date" id="ftDate"></div>
-      </div>
-      <div class="fr">
-        <div class="fg"><label>จำนวน</label><input type="number" id="ftVol" placeholder="100" min="0" step="any"></div>
-        <div class="fg"><label>ราคา/หน่วย (฿)</label><input type="number" id="ftPx" placeholder="5.00" step="any" min="0"></div>
-      </div>
-      <div class="fr">
-        <div class="fg"><label>ค่าธรรมเนียม (฿)</label><input type="number" id="ftFee" value="0" step="0.01"></div>
-        <div class="fg"><label>หมายเหตุ</label><input type="text" id="ftNote" placeholder="DCA"></div>
-      </div>
-      <div class="mr"><button class="btn btn-b" onclick="submitTx()">บันทึก</button><button class="btn btn-g" onclick="closeM('mTx')">ยกเลิก</button></div>
+<div class="modal">
+  <div class="mhd"><div class="mttl">📋 บันทึกซื้อ–ขาย</div><button class="mcl" onclick="closeM('mTx')">✕</button></div>
+  <div class="mbdy">
+    <div class="fg"><label>หุ้น / คริปโต</label><select id="ftSym"></select></div>
+    <div class="fr">
+      <div class="fg"><label>ประเภท</label><select id="ftType"><option value="Buy">ซื้อ (Buy)</option><option value="Sell">ขาย (Sell)</option></select></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="ftDate"></div>
     </div>
+    <div class="fr">
+      <div class="fg"><label>จำนวน (หุ้น/unit)</label><input type="number" id="ftVol" placeholder="100" min="0" step="any"></div>
+      <div class="fg"><label>ราคา/หน่วย (฿)</label><input type="number" id="ftPx" placeholder="5.00" min="0" step="any"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>ค่าธรรมเนียม (฿)</label><input type="number" id="ftFee" value="0" step="0.01" min="0"></div>
+      <div class="fg"><label>หมายเหตุ</label><input type="text" id="ftNote" placeholder="DCA, Take profit..."></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--rim);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--txt2)">
+      มูลค่ารวม: <span id="ftTotal" style="font-family:var(--mono);color:var(--gold);font-weight:700">฿0.00</span>
+    </div>
+    <div class="mr"><button class="btn btb" onclick="submitTx()">✅ บันทึก</button><button class="btn btg" onclick="closeM('mTx')">ยกเลิก</button></div>
   </div>
 </div>
+</div>
 
+<!-- Equity/DCA -->
 <div class="ov" id="mEq">
-  <div class="modal">
-    <div class="mhd"><div class="mttl">💰 เพิ่มรายการโอนเงิน</div><button class="mcl" onclick="closeM('mEq')">✕</button></div>
-    <div class="mbdy">
-      <div class="fr">
-        <div class="fg"><label>วันที่</label><input type="date" id="feDate"></div>
-        <div class="fg"><label>จำนวน (฿)</label><input type="number" id="feAmt" placeholder="5000" min="0"></div>
-      </div>
-      <div class="fg"><label>หมายเหตุ</label><input type="text" id="feNote" placeholder="DCA รายเดือน"></div>
-      <div class="mr"><button class="btn btn-b" onclick="submitEq()">บันทึก</button><button class="btn btn-g" onclick="closeM('mEq')">ยกเลิก</button></div>
+<div class="modal">
+  <div class="mhd"><div class="mttl">💰 บันทึกโอนเงิน DCA</div><button class="mcl" onclick="closeM('mEq')">✕</button></div>
+  <div class="mbdy">
+    <div class="fr">
+      <div class="fg"><label>วันที่</label><input type="date" id="feDate"></div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="feAmt" placeholder="5000" min="0" step="0.01"></div>
     </div>
+    <div class="fg"><label>หมายเหตุ</label><input type="text" id="feNote" placeholder="โอนเงินประจำเดือน"></div>
+    <div class="mr"><button class="btn btb" onclick="submitEq()">✅ บันทึก</button><button class="btn btg" onclick="closeM('mEq')">ยกเลิก</button></div>
   </div>
 </div>
+</div>
 
+<!-- Dividend -->
 <div class="ov" id="mDiv">
-  <div class="modal">
-    <div class="mhd"><div class="mttl">🎯 บันทึกเงินปันผล</div><button class="mcl" onclick="closeM('mDiv')">✕</button></div>
-    <div class="mbdy">
-      <div class="fg"><label>หุ้น</label><select id="fdSym"></select></div>
-      <div class="fr">
-        <div class="fg"><label>วันที่</label><input type="date" id="fdDate"></div>
-        <div class="fg"><label>จำนวน (฿)</label><input type="number" id="fdAmt" placeholder="1000" step="0.01"></div>
-      </div>
-      <div class="fg"><label>หมายเหตุ</label><input type="text" id="fdNote" placeholder="ปันผลประจำปี"></div>
-      <div class="mr"><button class="btn btn-b" onclick="submitDiv()">บันทึก</button><button class="btn btn-g" onclick="closeM('mDiv')">ยกเลิก</button></div>
+<div class="modal">
+  <div class="mhd"><div class="mttl">🎯 บันทึกเงินปันผล</div><button class="mcl" onclick="closeM('mDiv')">✕</button></div>
+  <div class="mbdy">
+    <div class="fg"><label>หุ้น</label><select id="fdSym"></select></div>
+    <div class="fr">
+      <div class="fg"><label>วันที่</label><input type="date" id="fdDate"></div>
+      <div class="fg"><label>จำนวน (฿)</label><input type="number" id="fdAmt" placeholder="1000" step="0.01" min="0"></div>
     </div>
+    <div class="fg"><label>หมายเหตุ</label><input type="text" id="fdNote" placeholder="ปันผลประจำปี, Tax Refund..."></div>
+    <div class="mr"><button class="btn btb" onclick="submitDiv()">✅ บันทึก</button><button class="btn btg" onclick="closeM('mDiv')">ยกเลิก</button></div>
   </div>
 </div>
+</div>
 
+<!-- Stock -->
 <div class="ov" id="mStock">
-  <div class="modal">
-    <div class="mhd"><div class="mttl">➕ เพิ่มหุ้น / คริปโต</div><button class="mcl" onclick="closeM('mStock')">✕</button></div>
-    <div class="mbdy">
-      <div class="fr">
-        <div class="fg"><label>ชื่อย่อ (Symbol)</label><input type="text" id="nsSym" placeholder="PTT / BTC" style="text-transform:uppercase"></div>
-        <div class="fg"><label>ชื่อเต็ม</label><input type="text" id="nsName" placeholder="ชื่อบริษัท"></div>
-      </div>
-      <div class="fg">
-        <label>ประเภท</label>
-        <select id="nsType"><option value="stock">📈 หุ้น (SET)</option><option value="crypto">₿ คริปโต (Bitkub)</option></select>
-      </div>
-      <div class="mr"><button class="btn btn-b" onclick="submitStock()">เพิ่ม</button><button class="btn btn-g" onclick="closeM('mStock')">ยกเลิก</button></div>
+<div class="modal">
+  <div class="mhd"><div class="mttl">➕ เพิ่มหุ้น / คริปโต</div><button class="mcl" onclick="closeM('mStock')">✕</button></div>
+  <div class="mbdy">
+    <div class="fr">
+      <div class="fg"><label>ชื่อย่อ (Symbol)</label><input type="text" id="nsSym" placeholder="PTT, BTC..." style="text-transform:uppercase"></div>
+      <div class="fg"><label>ชื่อเต็ม (ไม่บังคับ)</label><input type="text" id="nsName" placeholder="ชื่อบริษัท"></div>
     </div>
+    <div class="fg"><label>ประเภท</label>
+      <select id="nsType"><option value="stock">📈 หุ้น (SET — Yahoo Finance)</option><option value="crypto">₿ คริปโต (Bitkub)</option></select>
+    </div>
+    <div class="mr"><button class="btn btb" onclick="submitStock()">✅ เพิ่ม</button><button class="btn btg" onclick="closeM('mStock')">ยกเลิก</button></div>
   </div>
 </div>
+</div>
 
+<!-- Alert -->
 <div class="ov" id="mAlert">
-  <div class="modal">
-    <div class="mhd"><div class="mttl">🔔 ตั้งราคาเป้าหมาย</div><button class="mcl" onclick="closeM('mAlert')">✕</button></div>
-    <div class="mbdy">
-      <div class="fg"><label>หุ้น / คริปโต (Symbol)</label><input type="text" id="alSym" placeholder="เช่น UPOIC, BTC, ETH" style="text-transform:uppercase"></div>
-      <div class="fr">
-        <div class="fg">
-          <label>เงื่อนไข</label>
-          <select id="alCond">
-            <option value="above">📈 ขึ้นถึง (Above)</option>
-            <option value="below">📉 ลงถึง (Below)</option>
-          </select>
-        </div>
-        <div class="fg"><label>ราคาเป้าหมาย (฿)</label><input type="number" id="alPrice" placeholder="8.00" step="any" min="0"></div>
+<div class="modal">
+  <div class="mhd"><div class="mttl">🔔 ตั้งราคาเป้าหมาย</div><button class="mcl" onclick="closeM('mAlert')">✕</button></div>
+  <div class="mbdy">
+    <div class="fg"><label>Symbol (หุ้น หรือ คริปโต)</label><input type="text" id="alSym" placeholder="UPOIC, BTC, ETH..." style="text-transform:uppercase"></div>
+    <div class="fr">
+      <div class="fg"><label>เงื่อนไข</label>
+        <select id="alCond"><option value="above">📈 ราคาขึ้นถึง (Above)</option><option value="below">📉 ราคาลงถึง (Below)</option></select>
       </div>
-      <div class="fg"><label>หมายเหตุ</label><input type="text" id="alNote" placeholder="เช่น Take Profit, Stop Loss"></div>
-      <div class="mr"><button class="btn btn-b" onclick="submitAlert()">✅ ตั้งเป้าหมาย</button><button class="btn btn-g" onclick="closeM('mAlert')">ยกเลิก</button></div>
+      <div class="fg"><label>ราคาเป้าหมาย (฿)</label><input type="number" id="alPrice" placeholder="8.00" step="any" min="0"></div>
     </div>
+    <div class="fg"><label>หมายเหตุ</label><input type="text" id="alNote" placeholder="Take Profit, Stop Loss..."></div>
+    <div class="mr"><button class="btn btb" onclick="submitAlert()">✅ ตั้งเป้าหมาย</button><button class="btn btg" onclick="closeM('mAlert')">ยกเลิก</button></div>
   </div>
 </div>
+</div>
 
+<!-- Detail -->
 <div class="ov" id="mDet">
-  <div class="modal" style="max-width:520px">
-    <div class="mhd"><div class="mttl" id="detTitle">รายละเอียด</div><button class="mcl" onclick="closeM('mDet')">✕</button></div>
-    <div class="mbdy" id="detBody"></div>
-  </div>
+<div class="modal" style="max-width:500px">
+  <div class="mhd"><div class="mttl" id="detTitle">รายละเอียด</div><button class="mcl" onclick="closeM('mDet')">✕</button></div>
+  <div class="mbdy" id="detBody"></div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════════════
-const LS_URL   = 'tsp_url_v3';
-const LS_CACHE = 'tsp_data_v3';
-const PAL = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#fb7185','#a3e635','#f97316','#ec4899'];
-const CCOLOR = {BTC:'#f7931a',ETH:'#627eea',XRP:'#00aae4',DOGE:'#c2a633',ADA:'#8b5cf6',BNB:'#f3ba2f',SOL:'#9945ff',USDT:'#26a17b',MATIC:'#8247e5',LINK:'#2a5ada'};
+// ════════════════════════════════
+//  STATE
+// ════════════════════════════════
+const VER   = 'tp_v7';
+const PAL   = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#fb7185','#a3e635','#f97316','#ec4899'];
+const CCOL  = {BTC:'#f7931a',ETH:'#627eea',XRP:'#00aae4',DOGE:'#c2a633',ADA:'#8b5cf6',BNB:'#f3ba2f',SOL:'#9945ff',USDT:'#26a17b',MATIC:'#8247e5'};
 
-let URL = localStorage.getItem(LS_URL) || '';
+let APIURL = localStorage.getItem(VER+'_url') || '';
 let D = (() => {
-  try {
-    const r = localStorage.getItem(LS_CACHE);
-    if (r) return JSON.parse(r);
-  } catch(e) {}
-  return { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[], crypto:{} };
-})();
-const save = () => localStorage.setItem(LS_CACHE, JSON.stringify(D));
+  try{ const r=localStorage.getItem(VER+'_d'); return r?JSON.parse(r):null; }catch(e){}
+  return null;
+})() || { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[] };
+const persist = () => localStorage.setItem(VER+'_d', JSON.stringify(D));
 
-// ══════════════════════════════════════════════
-//  API
-// ══════════════════════════════════════════════
-async function api(action, body={}) {
-  if (!URL) throw new Error('ยังไม่ได้ตั้งค่า URL — ไปที่ ⚙️ ตั้งค่า');
-  const r = await fetch(URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, ...body })
+// ════════════════════════════════
+//  API  — ส่งเป็น GET เสมอ
+//  Apps Script รับ POST JSON ได้แต่ redirect บางครั้ง
+//  ใช้ GET param แทนเพื่อความเชื่อถือได้
+// ════════════════════════════════
+async function callAPI(action, params={}) {
+  if (!APIURL) throw new Error('ยังไม่ได้ตั้งค่า URL');
+
+  // สร้าง query string
+  const qs = new URLSearchParams({ action });
+  Object.keys(params).forEach(k => {
+    const v = params[k];
+    qs.set(k, typeof v === 'object' ? JSON.stringify(v) : String(v));
   });
-  const j = await r.json();
-  if (!j.ok) throw new Error(j.error || 'API error');
-  return j.data;
-}
-async function apiG(action) {
-  if (!URL) throw new Error('ยังไม่ได้ตั้งค่า URL');
-  const r = await fetch(`${URL}?action=${action}`);
-  const j = await r.json();
+
+  const url = APIURL + '?' + qs.toString();
+  const r   = await fetch(url, { redirect: 'follow' });
+  const txt = await r.text();
+
+  // หา JSON ในข้อความ (Apps Script บางครั้งมี whitespace นำหน้า)
+  const start = txt.indexOf('{');
+  if (start < 0) throw new Error('Response ไม่ใช่ JSON: ' + txt.substr(0,100));
+  const j = JSON.parse(txt.substr(start));
   if (!j.ok) throw new Error(j.error || 'API error');
   return j.data;
 }
 
-// ══════════════════════════════════════════════
-//  SETUP
-// ══════════════════════════════════════════════
-async function connectAndSeed() {
+// ════════════════════════════════
+//  CONNECT / SYNC
+// ════════════════════════════════
+async function doConnect() {
   const url = document.getElementById('setupUrl').value.trim();
   if (!url.includes('script.google.com')) { toast('⚠️ URL ไม่ถูกต้อง'); return; }
-  localStorage.setItem(LS_URL, url); URL = url;
-  load('กำลัง import ข้อมูลประวัติทั้งหมด...');
+  localStorage.setItem(VER+'_url', url); APIURL = url;
+  load('กำลังเชื่อมต่อและ import ข้อมูล...');
   try {
-    await api('seed', buildSeed());
-    await pull();
-    document.getElementById('setupScreen').style.display = 'none';
+    // seed ส่งผ่าน GET โดย encode เป็น JSON string
+    await callAPI('seed', { force: false });
+    await syncData();
+    document.getElementById('setup').style.display = 'none';
     document.getElementById('app').classList.add('on');
-    toast('✅ เชื่อมต่อและ import สำเร็จ!');
+    toast('✅ เชื่อมต่อสำเร็จ!');
   } catch(e) { toast('❌ ' + e.message); } finally { unload(); }
 }
 
-// ══════════════════════════════════════════════
-//  SYNC
-// ══════════════════════════════════════════════
-async function pull() {
-  const data = await apiG('getAll');
+async function syncData() {
+  const data = await callAPI('getAll');
   D.stocks       = data.stocks       || [];
   D.transactions = data.transactions || [];
   D.equity       = data.equity       || [];
   D.dividends    = data.dividends    || [];
   D.prices       = data.prices       || {};
   D.alerts       = data.alerts       || [];
-  // crypto มาจาก Prices sheet แยก type
-  if (data.crypto) D.crypto = data.crypto;
-  save();
+  persist();
 }
 
-async function refreshAll() {
-  dot('syncing');
+async function doRefresh() {
+  setDot('syncing');
   try {
-    await pull();
-    renderAll(); dot('ok');
+    await syncData(); renderAll(); setDot('ok');
     document.getElementById('stm').textContent = new Date().toLocaleTimeString('th-TH');
-  } catch(e) {
-    dot('err');
-    toast('⚠️ Sync ล้มเหลว (ใช้ cache): ' + e.message);
-    renderAll();
-  }
+  } catch(e) { setDot('err'); toast('⚠️ ' + e.message); renderAll(); }
 }
 
-function dot(s) {
-  const d = document.getElementById('sdot'), l = document.getElementById('slbl');
-  if (s === 'syncing') { d.style.background = 'var(--amber)'; l.textContent = 'Syncing…'; }
-  else if (s === 'ok') { d.style.background = 'var(--jade)'; l.textContent = 'Synced'; }
-  else                 { d.style.background = 'var(--rose)'; l.textContent = 'Offline'; }
+function setDot(s) {
+  const d=document.getElementById('sdot'), l=document.getElementById('slbl');
+  if(s==='syncing'){d.style.background='var(--amber)';l.textContent='Syncing…';}
+  else if(s==='ok'){d.style.background='var(--jade)';l.textContent='Synced';}
+  else{d.style.background='var(--rose)';l.textContent='Offline';}
 }
 
-// ══════════════════════════════════════════════
-//  CALCULATIONS
-// ══════════════════════════════════════════════
-function hld() {
+// ════════════════════════════════
+//  CALC
+// ════════════════════════════════
+function buildHoldings() {
   const m = {};
-  D.stocks.forEach(s => { m[s.symbol] = { ...s, volume: 0, cost: 0 }; });
+  D.stocks.forEach(s => { m[s.symbol]={...s,vol:0,cost:0}; });
   D.transactions.forEach(t => {
-    if (!m[t.symbol]) m[t.symbol] = { symbol:t.symbol, name:'', color:'#8b5cf6', volume:0, cost:0, type:'stock' };
-    const h = m[t.symbol], v = +t.volume, p = +t.price, fee = +(t.fee||0);
-    if (t.type === 'Buy') { h.cost += v*p + fee; h.volume += v; }
-    else { const avg = h.volume > 0 ? h.cost/h.volume : 0; h.cost -= v*avg - fee; h.volume = Math.max(0, h.volume - v); }
+    const s=t.symbol; if(!m[s]) m[s]={symbol:s,name:'',color:'#8b5cf6',type:'stock',vol:0,cost:0};
+    const v=+t.volume, p=+t.price, f=+(t.fee||0);
+    if(t.type==='Buy'){m[s].cost+=v*p+f;m[s].vol+=v;}
+    else{const avg=m[s].vol>0?m[s].cost/m[s].vol:0;m[s].cost-=v*avg-f;m[s].vol=Math.max(0,m[s].vol-v);}
   });
-  Object.values(m).forEach(h => {
-    h.avg   = h.volume > 0 ? h.cost / h.volume : 0;
-    const p = D.prices[h.symbol] || {};
-    h.mp    = +(p.price||0);
-    h.mv    = h.volume * h.mp;
-    h.pnl   = h.mv - h.cost;
-    h.pct   = h.cost > 0 ? h.pnl / h.cost * 100 : 0;
-    h.chg   = +(p.change||0);
-    h.cpct  = +(p.changePct||0);
-    h.high  = +(p.high||0);
-    h.low   = +(p.low||0);
-    h.vol   = +(p.volume||0);
-    h.upAt  = p.updatedAt ? String(p.updatedAt).replace('T',' ').substr(0,16) : '–';
+  Object.values(m).forEach(h=>{
+    h.avg = h.vol>0 ? h.cost/h.vol : 0;
+    const p=D.prices[h.symbol]||{};
+    h.mp=+(p.price||0); h.mv=h.vol*h.mp;
+    h.pnl=h.mv-h.cost; h.pct=h.cost>0?h.pnl/h.cost*100:0;
+    h.chg=+(p.change||0); h.cpct=+(p.changePct||0);
+    h.hi=+(p.high||0); h.lo=+(p.low||0); h.pvol=+(p.volume||0);
+    h.upAt=p.updatedAt?String(p.updatedAt).replace('T',' ').substr(0,16):'–';
   });
   return m;
 }
 
-function totals() {
-  const h = hld();
-  const active = Object.values(h).filter(x => x.volume > 0);
-  let cost = 0, val = 0;
-  active.forEach(x => { cost += x.cost; val += x.mv; });
-  const pnl    = val - cost;
-  const pp     = cost > 0 ? pnl/cost*100 : 0;
-  const div    = D.dividends.reduce((s,d) => s + (+d.amount), 0);
-  const eq     = D.equity.reduce((s,e) => s + (+e.amount), 0);
-  const stocks = active.filter(x => x.type !== 'crypto').length;
-  const crypto = active.filter(x => x.type === 'crypto').length;
-  return { cost, val, pnl, pp, div, eq, stocks, crypto, count: active.length };
+function calcTotals() {
+  const m=buildHoldings();
+  const active=Object.values(m).filter(x=>x.vol>0);
+  let cost=0,val=0;
+  active.forEach(x=>{cost+=x.cost;val+=x.mv;});
+  return {
+    cost,val,pnl:val-cost,pct:cost>0?(val-cost)/cost*100:0,
+    div:D.dividends.reduce((s,d)=>s+(+d.amount),0),
+    eq:D.equity.reduce((s,e)=>s+(+e.amount),0),
+    cnt:active.length
+  };
 }
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════
 //  FORMAT
-// ══════════════════════════════════════════════
-const f  = (n,d=2) => isNaN(+n) ? '–' : new Intl.NumberFormat('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
-const fB = (n,d=2) => '฿' + f(n,d);
-const set = (id,h) => { const e = document.getElementById(id); if (e) e.innerHTML = h; };
-function fK(n) {
-  const v = +n;
-  if (isNaN(v)) return '–';
-  const neg = v < 0;
-  const a = Math.abs(v);
-  const fmt = a >= 1e6 ? (a/1e6).toFixed(1)+'M' : a >= 1e4 ? (a/1e3).toFixed(1)+'K' : a.toFixed(2);
-  return (neg ? '-' : '') + '฿' + fmt;
-}
+// ════════════════════════════════
+const f=(n,d=2)=>isNaN(+n)?'–':new Intl.NumberFormat('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d}).format(+n);
+const fB=(n,d=2)=>'฿'+f(n,d);
+const fK=n=>{const v=+n;if(isNaN(v))return'–';const neg=v<0,a=Math.abs(v);return(neg?'-':'')+'฿'+(a>=1e6?(a/1e6).toFixed(1)+'M':a>=1e4?(a/1e3).toFixed(1)+'K':a.toFixed(2));};
+const set=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h;};
+const today=()=>new Date().toISOString().split('T')[0];
+const gv=id=>document.getElementById(id)?.value?.trim()||'';
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════
 //  RENDER ALL
-// ══════════════════════════════════════════════
-let eqCI = null;
-function renderAll() {
-  renderDash(); renderPort(); renderTxs(); renderEq(); renderDiv();
-  renderAlerts(); renderCrypto(); renderCfg(); fillSelects();
+// ════════════════════════════════
+let eqCI=null;
+function renderAll(){
+  renderDash();renderPort();renderTxs();renderDCA();renderDiv();
+  renderAlerts();renderCrypto();renderCfg();fillSymSelects();
 }
 
-function renderDash() {
-  const t = totals(), h = hld(), g = t.pnl >= 0;
-  set('k-eq',  fK(t.eq));
-  set('k-eq-s', `DCA ${D.equity.length} ครั้ง`);
-  const pe = document.getElementById('k-pnl');
-  pe.textContent = (g?'+':'') + fK(t.pnl);
-  pe.style.color = g ? 'var(--jade)' : 'var(--rose)';
-  document.getElementById('k-pc').className = `kpi ${g?'k-g':'k-r'}`;
-  set('k-pp', `<span style="color:${g?'var(--jade)':'var(--rose)'}">${g?'▲':'▼'} ${f(Math.abs(t.pp))}%</span>`);
-  set('k-pv', fK(t.val));
-  set('k-dv', fK(t.div));
-  set('k-tt', fK(t.pnl + t.div));
-  set('k-cn', `${t.stocks} <span style="font-size:11px;color:var(--txt3)">หุ้น</span> + ${t.crypto} <span style="font-size:11px;color:var(--txt3)">crypto</span>`);
+function renderDash(){
+  const t=calcTotals(),m=buildHoldings(),g=t.pnl>=0;
+  set('kdca',fK(t.eq)); set('kdca2','DCA '+D.equity.length+' ครั้ง');
+  const pe=document.getElementById('kpnl');
+  pe.textContent=(g?'+':'')+fK(t.pnl); pe.style.color=g?'var(--jade)':'var(--rose)';
+  document.getElementById('kpnlcard').className='kpi '+(g?'kg2':'kr');
+  set('kpnlp','<span style="color:'+(g?'var(--jade)':'var(--rose)')+'">'+( g?'▲':'▼')+' '+f(Math.abs(t.pct))+'%</span>');
+  set('kval',fK(t.val)); set('kdiv',fK(t.div)); set('ktot',fK(t.pnl+t.div)); set('kcnt',t.cnt+'');
 
-  // Summary table (active only)
-  set('sumTbl', Object.values(h).filter(x => x.volume > 0).map(x => {
-    const g = x.pnl >= 0;
-    return `<tr>
-      <td><b style="color:${x.color||'var(--sky)'}">${x.symbol}</b></td>
-      <td>${fB(x.avg,3)}</td><td>${fB(x.mp)}</td><td>${f(x.volume,0)}</td>
-      <td>${fB(x.mv)}</td><td>${fB(x.cost)}</td>
-      <td style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${fB(x.pnl)}</td>
-      <td style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</td>
-    </tr>`;
-  }).join(''));
+  const active=Object.values(m).filter(x=>x.vol>0);
+  set('sumTbl',active.map(x=>{const g=x.pnl>=0;return`<tr>
+    <td><b style="color:${x.color||'var(--sky)'}">${x.symbol}</b></td>
+    <td>${fB(x.avg,3)}</td><td>${fB(x.mp)}</td><td>${f(x.vol,0)}</td>
+    <td>${fB(x.mv)}</td><td>${fB(x.cost)}</td>
+    <td style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${fB(x.pnl)}</td>
+    <td style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</td>
+  </tr>`; }).join(''));
 
-  // Alloc bars
-  const tv = Object.values(h).filter(x => x.volume > 0).reduce((s,x) => s+x.mv, 0);
-  set('allocL', Object.values(h).filter(x => x.volume > 0).map(x => {
-    const p = tv > 0 ? x.mv/tv*100 : 0;
-    return `<div>
-      <div class="ai-inf">
-        <span style="color:${x.color||'var(--sky)'};font-weight:700">${x.symbol}</span>
-        <span style="color:var(--txt2)">${f(p,1)}% &nbsp; ${fB(x.mv)}</span>
-      </div>
-      <div class="bb"><div class="bf" style="width:${p}%;background:${x.color||'var(--sky)'}"></div></div>
-    </div>`;
-  }).join(''));
+  const tv=active.reduce((s,x)=>s+x.mv,0);
+  set('allocWrap',active.map(x=>{const p=tv>0?x.mv/tv*100:0;return`<div class="alloc-item">
+    <div class="alloc-inf"><span style="color:${x.color||'var(--sky)'};font-weight:700">${x.symbol}</span>
+    <span style="color:var(--txt2)">${f(p,1)}% &nbsp; ${fB(x.mv)}</span></div>
+    <div class="bb"><div class="bf" style="width:${p}%;background:${x.color||'var(--sky)'}"></div></div>
+  </div>`; }).join(''));
 
   // DCA chart
-  const sorted = [...D.equity].sort((a,b) => new Date(a.date)-new Date(b.date));
-  let cum = 0; const lbs = [], vs = [], step = Math.max(1, Math.floor(sorted.length/45));
-  sorted.forEach((e,i) => {
-    cum += +e.amount;
-    if (i%step===0 || i===sorted.length-1) { lbs.push(e.date.substr(0,7)); vs.push(+cum.toFixed(2)); }
-  });
-  const ctx = document.getElementById('eqChart');
-  if (eqCI) { eqCI.destroy(); eqCI = null; }
-  if (window.Chart && lbs.length) eqCI = new Chart(ctx, {
-    type: 'line',
-    data: { labels: lbs, datasets: [{ label:'DCA สะสม', data:vs, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.07)', borderWidth:2, fill:true, tension:.4, pointRadius:0 }] },
-    options: { responsive:true, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>'฿'+f(c.raw)}} },
-               scales: { x:{grid:{color:'#1c2539'},ticks:{color:'#4a617f',maxTicksLimit:10,font:{size:10}}},
-                         y:{grid:{color:'#1c2539'},ticks:{color:'#4a617f',font:{size:10},callback:v=>'฿'+f(v,0)}} } }
-  });
+  const sorted=[...D.equity].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  let cum=0;const lbs=[],vs=[],step=Math.max(1,Math.floor(sorted.length/45));
+  sorted.forEach((e,i)=>{cum+=+e.amount;if(i%step===0||i===sorted.length-1){lbs.push(e.date.substr(0,7));vs.push(+cum.toFixed(2));}});
+  const ctx=document.getElementById('eqChart');
+  if(eqCI){eqCI.destroy();eqCI=null;}
+  if(window.Chart&&lbs.length) eqCI=new Chart(ctx,{type:'line',data:{labels:lbs,datasets:[{label:'DCA',data:vs,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.07)',borderWidth:2,fill:true,tension:.4,pointRadius:0}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'฿'+f(c.raw)}}},scales:{x:{grid:{color:'#1c2539'},ticks:{color:'#4a617f',maxTicksLimit:10,font:{size:10}}},y:{grid:{color:'#1c2539'},ticks:{color:'#4a617f',font:{size:10},callback:v=>'฿'+f(v,0)}}}}});
 }
 
-function renderPort() {
-  const h = hld();
-  const active = Object.values(h).filter(x => x.volume > 0 && x.type !== 'crypto');
-  set('stockGrid', active.map(x => {
-    const g = x.pnl >= 0, cc = x.cpct>0?'up':x.cpct<0?'dn':'fl', bw = Math.min(Math.abs(x.pct)*2,100);
+function renderPort(){
+  const m=buildHoldings();
+  const stocks=Object.values(m).filter(x=>x.vol>0&&x.type!=='crypto');
+  set('stockGrid',stocks.map(x=>{
+    const g=x.pnl>=0,cc=x.cpct>0?'up':x.cpct<0?'dn':'fl',bw=Math.min(Math.abs(x.pct)*2,100);
     return `<div class="sc">
-      <div class="sc-hd">
-        <div>
-          <div class="sym" style="color:${x.color||'var(--sky)'}">${x.symbol}</div>
-          <div class="snm">${x.name||''}</div>
-          <div style="font-size:9.5px;color:var(--txt3);margin-top:2px;font-family:var(--mono)">🕐 ${x.upAt}</div>
-        </div>
-        <div class="pb">
-          <div class="mp" style="color:${x.color||'var(--sky)'}">${fB(x.mp)}</div>
-          <div class="cp ${cc}">${x.cpct>=0?'▲':'▼'} ${f(Math.abs(x.cpct))}%</div>
-        </div>
+      <div class="sch">
+        <div><div class="sym" style="color:${x.color||'var(--sky)'}">${x.symbol}</div>
+        <div class="snm">${x.name||''}</div>
+        <div style="font-size:9px;color:var(--txt3);margin-top:2px;font-family:var(--mono)">🕐 ${x.upAt}</div></div>
+        <div class="pb"><div class="mp" style="color:${x.color||'var(--sky)'}">${fB(x.mp)}</div>
+        <div class="cp ${cc}">${x.cpct>=0?'▲':'▼'} ${f(Math.abs(x.cpct))}%</div></div>
       </div>
-      <div class="sc-bd">
-        <div class="sr"><span class="sl">สูง/ต่ำ วันนี้</span><span class="sv" style="font-size:11px"><span style="color:var(--jade)">${x.high>0?fB(x.high):'–'}</span> / <span style="color:var(--rose)">${x.low>0?fB(x.low):'–'}</span></span></div>
-        <div class="sr"><span class="sl">ปริมาณ</span><span class="sv" style="font-size:11px">${x.vol>0?f(x.vol,0):' –'}</span></div>
-        <div class="sr"><span class="sl">ถือ</span><span class="sv">${f(x.volume,0)} หุ้น</span></div>
+      <div class="scb">
+        <div class="sr"><span class="sl">สูง/ต่ำ</span><span class="sv" style="font-size:10.5px"><span style="color:var(--jade)">${x.hi>0?fB(x.hi):'–'}</span>/<span style="color:var(--rose)">${x.lo>0?fB(x.lo):'–'}</span></span></div>
+        <div class="sr"><span class="sl">ถือ</span><span class="sv">${f(x.vol,0)} หุ้น</span></div>
         <div class="sr"><span class="sl">ต้นทุนเฉลี่ย</span><span class="sv">${fB(x.avg,3)}</span></div>
-        <div class="sr"><span class="sl">มูลค่า</span><span class="sv">${fB(x.mv)}</span></div>
-        <div class="sr"><span class="sl">ต้นทุนรวม</span><span class="sv">${fB(x.cost)}</span></div>
+        <div class="sr"><span class="sl">มูลค่าปัจจุบัน</span><span class="sv">${fB(x.mv)}</span></div>
         <div class="sr"><span class="sl">กำไร/ขาดทุน</span><span class="sv" style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${fB(x.pnl)}</span></div>
         <div class="bw"><div class="bl"><span>${g?'กำไร':'ขาดทุน'}</span><span style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</span></div>
-        <div class="bb"><div class="bf ${g?'bg':'br2'}" style="width:${bw}%"></div></div></div>
+        <div class="bb"><div class="bf ${g?'bfg':'bfr'}" style="width:${bw}%"></div></div></div>
       </div>
-      <div class="sc-ft">
-        <button class="bs buy"   onclick="openTxFor('${x.symbol}','Buy')">+ ซื้อ</button>
-        <button class="bs sell"  onclick="openTxFor('${x.symbol}','Sell')">− ขาย</button>
-        <button class="bs alert" onclick="quickAlert('${x.symbol}')">🔔 ตั้งเป้า</button>
-        <button class="bs info"  onclick="openDet('${x.symbol}')">📊 รายละเอียด</button>
+      <div class="scf">
+        <button class="bs bsbuy"   onclick="openTxModal('${x.symbol}','Buy')">+ ซื้อ</button>
+        <button class="bs bssell"  onclick="openTxModal('${x.symbol}','Sell')">− ขาย</button>
+        <button class="bs bsalert" onclick="openAlertModal('${x.symbol}')">🔔 เป้า</button>
+        <button class="bs bsinfo"  onclick="openDetail('${x.symbol}')">📊 รายละเอียด</button>
       </div>
     </div>`;
-  }).join('') || '<div style="color:var(--txt3);text-align:center;padding:30px">ยังไม่มีหุ้น — กด "+ เพิ่มหุ้น"</div>');
+  }).join('')||'<div style="color:var(--txt3);text-align:center;padding:30px;font-size:13px">ยังไม่มีหุ้น — กด "+ เพิ่มหุ้น"</div>');
 }
 
-function renderTxs() {
-  const flt = document.getElementById('txFltr').value;
-  const list = [...D.transactions]
-    .filter(t => !flt || t.symbol === flt)
-    .sort((a,b) => new Date(b.date)-new Date(a.date));
-  set('txTbl', list.map((t,i) => `<tr>
-    <td>${i+1}</td><td>${t.date}</td>
-    <td><b>${t.symbol}</b></td>
-    <td><span class="tag ${t.type==='Buy'?'tb':'ts'}">${t.type}</span></td>
+function renderTxs(){
+  const flt=document.getElementById('txFltr')?.value||'';
+  set('txTbl',[...D.transactions].filter(t=>!flt||t.symbol===flt).sort((a,b)=>new Date(b.date)-new Date(a.date)).map((t,i)=>`<tr>
+    <td>${i+1}</td><td>${t.date}</td><td><b>${t.symbol}</b></td>
+    <td><span class="tag ${t.type==='Buy'?'tbuy':'tsell'}">${t.type}</span></td>
     <td>${f(t.volume,0)}</td><td>${fB(+t.price,3)}</td>
-    <td>${fB(+t.volume * +t.price)}</td>
+    <td>${fB(+t.volume*(+t.price))}</td>
     <td style="color:var(--txt3)">${t.note||''}</td>
     <td><button class="db" onclick="delTx('${t.id}')">✕</button></td>
   </tr>`).join(''));
 }
 
-function renderEq() {
-  const s = [...D.equity].sort((a,b) => new Date(b.date)-new Date(a.date));
-  const tot = s.reduce((x,e) => x+(+e.amount), 0);
-  set('eqTot', fK(tot)); set('eqCnt', s.length+'');
-  set('eqTbl', s.map((e,i) => `<tr>
+function renderDCA(){
+  const s=[...D.equity].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tot=s.reduce((x,e)=>x+(+e.amount),0);
+  set('eqTot',fK(tot)); set('eqCnt',s.length+'');
+  set('eqTbl',s.map((e,i)=>`<tr>
     <td>${i+1}</td><td>${e.date}</td>
     <td style="color:var(--sky)">${fB(+e.amount)}</td>
     <td style="color:var(--txt3)">${e.note||''}</td>
@@ -816,565 +735,400 @@ function renderEq() {
   </tr>`).join(''));
 }
 
-function renderDiv() {
-  const s = [...D.dividends].sort((a,b) => new Date(b.date)-new Date(a.date));
-  const tot  = s.reduce((x,d) => x+(+d.amount), 0);
-  const yr   = s.filter(d => String(d.date||'').startsWith(String(new Date().getFullYear())))
-                .reduce((x,d) => x+(+d.amount), 0);
-  set('dvTot', fK(tot)); set('dvYr', fK(yr));
-  set('dvTbl', s.map((d,i) => `<tr>
-    <td>${i+1}</td><td>${d.date}</td>
-    <td><b>${d.symbol}</b></td>
+function renderDiv(){
+  const s=[...D.dividends].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tot=s.reduce((x,d)=>x+(+d.amount),0);
+  const yr=s.filter(d=>String(d.date||'').startsWith(String(new Date().getFullYear()))).reduce((x,d)=>x+(+d.amount),0);
+  set('dvTot',fK(tot)); set('dvYr',fK(yr));
+  set('dvTbl',s.map((d,i)=>`<tr>
+    <td>${i+1}</td><td>${d.date}</td><td><b>${d.symbol}</b></td>
     <td style="color:var(--gold)">${fB(+d.amount)}</td>
     <td style="color:var(--txt3)">${d.note||''}</td>
     <td><button class="db" onclick="delDiv('${d.id}')">✕</button></td>
   </tr>`).join(''));
 }
 
-function renderAlerts() {
-  const alerts = D.alerts || [];
-  set('alertTbl', alerts.length
-    ? [...alerts].sort((a,b) => new Date(b.createdAt||0)-new Date(a.createdAt||0)).map((a,i) => {
-        const cur     = +(D.prices[a.symbol]?.price || 0);
-        const tgt     = +a.targetPrice || 0;
-        const cond    = String(a.condition || 'above').toLowerCase();
-        const active  = String(a.active) !== 'false';
-        const done    = !!(a.triggeredAt && a.triggeredAt !== '');
-        const arrow   = cond === 'above' ? '📈' : '📉';
-        const condTxt = cond === 'above' ? 'ขึ้นถึง' : 'ลงถึง';
-        const near    = tgt > 0 && cur > 0 ? Math.abs((cur-tgt)/tgt*100).toFixed(1) : '–';
-        const status  = done
-          ? `<span style="color:var(--jade);font-size:11px">✅ แจ้งแล้ว</span>`
-          : active
-            ? `<span style="color:var(--amber);font-size:11px">⏳ ห่าง ${near}%</span>`
-            : `<span style="color:var(--txt3);font-size:11px">⏸ ปิด</span>`;
-        return `<tr>
-          <td>${i+1}</td>
-          <td><b>${a.symbol}</b></td>
-          <td>${arrow} ${condTxt}</td>
-          <td style="font-family:var(--mono);color:var(--gold)">${fB(tgt)}</td>
-          <td style="font-family:var(--mono)">${cur > 0 ? fB(cur) : '–'}</td>
-          <td>${status}</td>
-          <td style="color:var(--txt3);font-size:12px">${a.note||''}</td>
-          <td><button class="db" onclick="delAlert('${a.id}')">✕</button></td>
-        </tr>`;
-      }).join('')
-    : '<tr><td colspan="8" style="text-align:center;color:var(--txt3);padding:24px">ยังไม่มีราคาเป้าหมาย — กด "+ ตั้งเป้า"</td></tr>'
-  );
+function renderAlerts(){
+  set('alertTbl',D.alerts.length?[...D.alerts].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).map((a,i)=>{
+    const cur=+(D.prices[a.symbol]?.price||0),tgt=+a.targetPrice||0;
+    const cond=String(a.condition||'above'),active=String(a.active)!=='false';
+    const done=!!(a.triggeredAt&&a.triggeredAt!=='');
+    const near=tgt>0&&cur>0?Math.abs((cur-tgt)/tgt*100).toFixed(1):'–';
+    const stat=done?`<span style="color:var(--jade);font-size:11px">✅ แจ้งแล้ว</span>`
+      :active?`<span style="color:var(--amber);font-size:11px">⏳ ห่าง ${near}%</span>`
+      :`<span style="color:var(--txt3);font-size:11px">⏸ ปิด</span>`;
+    return `<tr><td>${i+1}</td><td><b>${a.symbol}</b></td>
+      <td>${cond==='above'?'📈 ขึ้นถึง':'📉 ลงถึง'}</td>
+      <td style="color:var(--gold);font-family:var(--mono)">${fB(tgt)}</td>
+      <td style="font-family:var(--mono)">${cur>0?fB(cur):'–'}</td>
+      <td>${stat}</td><td style="color:var(--txt3);font-size:11px">${a.note||''}</td>
+      <td><button class="db" onclick="delAlert('${a.id}')">✕</button></td></tr>`;
+  }).join(''):'<tr><td colspan="8" style="text-align:center;color:var(--txt3);padding:22px">ยังไม่มีราคาเป้าหมาย</td></tr>');
 }
 
-function renderCrypto() {
-  // สร้าง cryptoMap จาก stocks ที่ type=crypto + prices
-  const cryptoStocks = D.stocks.filter(s => s.type === 'crypto');
-  const noData = cryptoStocks.length === 0;
-
-  set('cryptoGrid', cryptoStocks.map(s => {
-    const p = D.prices[s.symbol] || {};
-    const g = +(p.changePct||0) >= 0;
-    const col = CCOLOR[s.symbol] || s.color || '#8b5cf6';
-    const upAt = p.updatedAt ? String(p.updatedAt).replace('T',' ').substr(11,5) : '–';
+function renderCrypto(){
+  const cryptos=D.stocks.filter(s=>s.type==='crypto');
+  set('cryptoGrid',cryptos.map(s=>{
+    const p=D.prices[s.symbol]||{},g=+(p.changePct||0)>=0;
+    const col=CCOL[s.symbol]||s.color||'#8b5cf6';
     return `<div class="kpi" style="border-color:${col}30;background:linear-gradient(135deg,var(--card),${col}08)">
       <div class="kl" style="color:${col}">${s.symbol}/THB</div>
       <div class="kv" style="color:${col}">${fK(+(p.price||0))}</div>
-      <div class="ks" style="color:${g?'var(--jade)':'var(--rose)'}">${g?'▲':'▼'} ${f(Math.abs(+(p.changePct||0)))}% &nbsp;${upAt}</div>
+      <div class="ks" style="color:${g?'var(--jade)':'var(--rose)'}">${g?'▲':'▼'} ${f(Math.abs(+(p.changePct||0)))}%</div>
     </div>`;
-  }).join('') || (noData ? '<div style="color:var(--txt3);font-size:13px">เพิ่ม symbol ด้านบนเพื่อติดตามราคา</div>' : ''));
+  }).join('')||'<div style="color:var(--txt3);font-size:12px">เพิ่ม symbol ด้านบนเพื่อติดตาม</div>');
 
-  set('cryptoTbl', cryptoStocks.map(s => {
-    const p = D.prices[s.symbol] || {};
-    const g = +(p.changePct||0) >= 0;
-    const upAt = p.updatedAt ? String(p.updatedAt).replace('T',' ').substr(0,16) : '–';
+  set('cryptoTbl',cryptos.map(s=>{
+    const p=D.prices[s.symbol]||{},g=+(p.changePct||0)>=0;
+    const col=CCOL[s.symbol]||s.color||'var(--violet)';
     return `<tr>
-      <td><b style="color:${CCOLOR[s.symbol]||s.color||'var(--violet)'}">${s.symbol}</b></td>
+      <td><b style="color:${col}">${s.symbol}</b></td>
       <td style="font-family:var(--mono)">${fB(+(p.price||0))}</td>
       <td style="font-family:var(--mono);color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${fB(+(p.change||0))}</td>
       <td style="font-family:var(--mono);color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(+(p.changePct||0))}%</td>
-      <td style="font-family:var(--mono)">${p.volume ? f(+p.volume,0) : '–'}</td>
-      <td style="color:var(--txt3);font-size:11px;font-family:var(--mono)">${upAt}</td>
+      <td style="font-family:var(--mono)">${+(p.high||0)>0?fB(+(p.high||0)):'–'}</td>
+      <td style="font-family:var(--mono)">${+(p.low||0)>0?fB(+(p.low||0)):'–'}</td>
+      <td style="font-size:10.5px;color:var(--txt3)">${p.updatedAt?String(p.updatedAt).replace('T',' ').substr(0,16):'–'}</td>
       <td><button class="db" onclick="delCrypto('${s.id}','${s.symbol}')">✕</button></td>
     </tr>`;
-  }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--txt3);padding:20px">เพิ่ม symbol ด้านบนเพื่อเริ่มติดตาม</td></tr>');
+  }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--txt3);padding:20px">เพิ่ม symbol ด้านบนเพื่อเริ่มติดตาม</td></tr>');
 }
 
-function renderCfg() {
-  document.getElementById('cfgUrl').value = URL;
-  set('priceIn', D.stocks.filter(s => s.type !== 'crypto').map(s => {
-    const p = D.prices[s.symbol] || {};
-    const upAt = p.updatedAt ? String(p.updatedAt).substr(0,16).replace('T',' ') : '–';
+function renderCfg(){
+  document.getElementById('cfgUrl').value=APIURL;
+  set('manualPrices',D.stocks.filter(s=>s.type!=='crypto').map(s=>{
+    const p=D.prices[s.symbol]||{};
     return `<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-      <span style="font-family:var(--mono);font-weight:700;color:${s.color||'var(--sky)'};min-width:55px;font-size:13px">${s.symbol}</span>
-      <span style="font-family:var(--mono);font-size:13px;min-width:60px;color:${+(p.changePct||0)>=0?'var(--jade)':'var(--rose)'}">${p.price?fB(+p.price):'–'}</span>
-      <input type="number" step="any" value="${p.price||''}" placeholder="ราคา" id="pi-${s.symbol}" style="width:88px;padding:6px 9px;font-size:12px">
+      <span style="font-family:var(--mono);font-weight:700;color:${s.color||'var(--sky)'};min-width:52px;font-size:13px">${s.symbol}</span>
+      <span style="font-family:var(--mono);font-size:13px;min-width:58px;color:${+(p.changePct||0)>=0?'var(--jade)':'var(--rose)'}">${p.price?fB(+p.price):'–'}</span>
+      <input type="number" step="any" value="${p.price||''}" placeholder="ราคา" id="pi-${s.symbol}" style="width:85px;padding:6px 9px;font-size:12px">
       <button class="bs" onclick="savePrice('${s.symbol}')">OK</button>
-      <span style="font-size:10px;color:var(--txt3)">${upAt}</span>
     </div>`;
-  }).join('') || '<div style="color:var(--txt3);font-size:13px">ยังไม่มีหุ้น</div>');
+  }).join(''));
 }
 
-function fillSelects() {
-  ['ftSym','fdSym','txFltr'].forEach(id => {
-    const el = document.getElementById(id); if (!el) return;
-    const cur = el.value;
-    el.innerHTML = (id==='txFltr' ? '<option value="">ทุกหุ้น/คริปโต</option>' : '') +
-      D.stocks.map(s => `<option value="${s.symbol}">${s.symbol} ${s.type==='crypto'?'₿':''}</option>`).join('');
-    if (cur) el.value = cur;
+function fillSymSelects(){
+  ['ftSym','fdSym','txFltr'].forEach(id=>{
+    const el=document.getElementById(id); if(!el)return;
+    const cur=el.value;
+    el.innerHTML=(id==='txFltr'?'<option value="">ทุกหุ้น/คริปโต</option>':'')+
+      D.stocks.map(s=>`<option value="${s.symbol}">${s.symbol}${s.type==='crypto'?' ₿':''}</option>`).join('');
+    if(cur)el.value=cur;
   });
 }
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════
 //  UI HELPERS
-// ══════════════════════════════════════════════
-const load   = (m='กำลังโหลด...') => { document.getElementById('lmsg').textContent=m; document.getElementById('loader').classList.add('on'); };
-const unload = () => document.getElementById('loader').classList.remove('on');
-const openM  = id => document.getElementById(id).classList.add('on');
-const closeM = id => document.getElementById(id).classList.remove('on');
-const today  = () => new Date().toISOString().split('T')[0];
-const gv     = id => document.getElementById(id)?.value || '';
-function toast(msg, dur=3500) {
-  const t = document.getElementById('toast'); t.textContent=msg; t.classList.add('on');
-  setTimeout(() => t.classList.remove('on'), dur);
-}
-function pg(id, btn) {
-  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+// ════════════════════════════════
+const load=(m='กำลังโหลด...')=>{document.getElementById('lmsg').textContent=m;document.getElementById('loader').classList.add('on');};
+const unload=()=>document.getElementById('loader').classList.remove('on');
+const openM=id=>document.getElementById(id).classList.add('on');
+const closeM=id=>document.getElementById(id).classList.remove('on');
+function toast(msg,dur=3500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),dur);}
+function goPg(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
-  if (btn) btn.classList.add('on');
+  if(btn)btn.classList.add('on');
 }
-document.querySelectorAll('.ov').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('on'); }));
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');}));
 
-// ══════════════════════════════════════════════
-//  ACTIONS — TRANSACTIONS
-// ══════════════════════════════════════════════
-function openAddTx() {
-  fillSelects();
-  document.getElementById('ftDate').value = today();
-  document.getElementById('ftVol').value  = '';
-  document.getElementById('ftPx').value   = '';
-  document.getElementById('ftFee').value  = '0';
-  document.getElementById('ftNote').value = '';
+// ════════════════════════════════
+//  MODAL OPENERS
+// ════════════════════════════════
+function openTxModal(sym, type){
+  fillSymSelects();
+  if(sym) document.getElementById('ftSym').value=sym;
+  if(type) document.getElementById('ftType').value=type;
+  document.getElementById('ftDate').value=today();
+  document.getElementById('ftVol').value='';
+  document.getElementById('ftPx').value='';
+  document.getElementById('ftFee').value='0';
+  document.getElementById('ftNote').value='';
+  set('ftTotal','฿0.00');
   openM('mTx');
 }
-function openTxFor(sym, type) {
-  fillSelects();
-  document.getElementById('ftSym').value  = sym;
-  document.getElementById('ftType').value = type;
-  document.getElementById('ftDate').value = today();
-  document.getElementById('ftVol').value  = '';
-  document.getElementById('ftPx').value   = '';
-  document.getElementById('ftFee').value  = '0';
-  document.getElementById('ftNote').value = '';
-  openM('mTx');
-}
+// live total preview
+['ftVol','ftPx','ftFee'].forEach(id=>{
+  document.addEventListener('DOMContentLoaded',()=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('input',()=>{
+      const v=+gv('ftVol'),p=+gv('ftPx'),f2=+gv('ftFee');
+      set('ftTotal','฿'+f(v*p+f2));
+    });
+  });
+});
 
-async function submitTx() {
-  const sym    = gv('ftSym').trim();
-  const type   = gv('ftType');
-  const date   = gv('ftDate');
-  const volume = +gv('ftVol');
-  const price  = +gv('ftPx');
-  const fee    = +(gv('ftFee')||0);
-  const note   = gv('ftNote');
-
-  if (!sym)    { toast('⚠️ เลือกหุ้น/คริปโต'); return; }
-  if (!date)   { toast('⚠️ เลือกวันที่'); return; }
-  if (!volume || volume <= 0) { toast('⚠️ ใส่จำนวน'); return; }
-  if (!price  || price <= 0)  { toast('⚠️ ใส่ราคา'); return; }
-
-  load('กำลังบันทึก...');
-  try {
-    const b = { symbol:sym, type, date, volume, price, fee, note };
-    const r = await api('addTx', b);
-    D.transactions.push({ ...b, id: r.id }); save();
-    closeM('mTx'); renderAll();
-    toast(`✅ บันทึก ${type} ${sym} จำนวน ${volume} @ ฿${price}`);
-  } catch(e) { toast('❌ ' + e.message); } finally { unload(); }
-}
-async function delTx(id) {
-  if (!confirm('ลบรายการนี้?')) return; load();
-  try { await api('deleteTx',{id}); D.transactions=D.transactions.filter(t=>t.id!==id); save(); renderTxs(); renderDash(); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-
-// ══════════════════════════════════════════════
-//  ACTIONS — EQUITY
-// ══════════════════════════════════════════════
-function openAddEq() {
-  document.getElementById('feDate').value  = today();
-  document.getElementById('feAmt').value   = '';
-  document.getElementById('feNote').value  = '';
+function openEqModal(){
+  document.getElementById('feDate').value=today();
+  document.getElementById('feAmt').value='';
+  document.getElementById('feNote').value='';
   openM('mEq');
 }
-async function submitEq() {
-  const date   = gv('feDate');
-  const amount = +gv('feAmt');
-  const note   = gv('feNote');
-  if (!date)            { toast('⚠️ เลือกวันที่'); return; }
-  if (!amount || amount <= 0) { toast('⚠️ ใส่จำนวนเงิน'); return; }
-  load('กำลังบันทึก...');
-  try {
-    const b = { date, amount, note };
-    const r = await api('addEquity', b);
-    D.equity.push({ ...b, id:r.id }); save();
-    closeM('mEq'); renderEq(); renderDash();
-    toast('✅ บันทึก DCA ฿' + amount.toLocaleString() + ' สำเร็จ');
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-async function delEq(id) {
-  if (!confirm('ลบรายการนี้?')) return; load();
-  try { await api('deleteEquity',{id}); D.equity=D.equity.filter(e=>e.id!==id); save(); renderEq(); renderDash(); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-
-// ══════════════════════════════════════════════
-//  ACTIONS — DIVIDEND
-// ══════════════════════════════════════════════
-function openAddDiv() {
-  fillSelects();
-  document.getElementById('fdDate').value  = today();
-  document.getElementById('fdAmt').value   = '';
-  document.getElementById('fdNote').value  = '';
+function openDivModal(){
+  fillSymSelects();
+  document.getElementById('fdDate').value=today();
+  document.getElementById('fdAmt').value='';
+  document.getElementById('fdNote').value='';
   openM('mDiv');
 }
-async function submitDiv() {
-  const symbol = gv('fdSym').trim();
-  const date   = gv('fdDate');
-  const amount = +gv('fdAmt');
-  const note   = gv('fdNote');
-  if (!symbol)          { toast('⚠️ เลือกหุ้น'); return; }
-  if (!date)            { toast('⚠️ เลือกวันที่'); return; }
-  if (!amount || amount <= 0) { toast('⚠️ ใส่จำนวนเงิน'); return; }
-  load('กำลังบันทึก...');
-  try {
-    const b = { symbol, date, amount, note };
-    const r = await api('addDividend', b);
-    D.dividends.push({ ...b, id:r.id }); save();
-    closeM('mDiv'); renderDiv(); renderDash();
-    toast('✅ บันทึกปันผล '+symbol+' ฿'+amount+' สำเร็จ');
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-async function delDiv(id) {
-  if (!confirm('ลบรายการนี้?')) return; load();
-  try { await api('deleteDividend',{id}); D.dividends=D.dividends.filter(d=>d.id!==id); save(); renderDiv(); renderDash(); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-
-// ══════════════════════════════════════════════
-//  ACTIONS — STOCKS & ALERTS
-// ══════════════════════════════════════════════
-function openAddStock() {
-  document.getElementById('nsSym').value  = '';
-  document.getElementById('nsName').value = '';
+function openStockModal(){
+  document.getElementById('nsSym').value='';
+  document.getElementById('nsName').value='';
   openM('mStock');
 }
-async function submitStock() {
-  const sym  = gv('nsSym').trim().toUpperCase();
-  const name = gv('nsName').trim() || sym;
-  const type = gv('nsType');
-  if (!sym) { toast('⚠️ ใส่ชื่อย่อ เช่น PTT, BTC'); return; }
-  if (D.stocks.find(s => s.symbol === sym)) { toast(`⚠️ ${sym} มีอยู่แล้ว`); return; }
-  const color = (type==='crypto' ? CCOLOR[sym] : null) || PAL[D.stocks.length % PAL.length];
+function openAlertModal(sym){
+  document.getElementById('alSym').value=sym||'';
+  document.getElementById('alPrice').value='';
+  document.getElementById('alNote').value='';
+  openM('mAlert');
+}
+
+// ════════════════════════════════
+//  SUBMIT FUNCTIONS
+// ════════════════════════════════
+async function submitTx(){
+  const sym=gv('ftSym'),type=gv('ftType'),date=gv('ftDate'),vol=+gv('ftVol'),px=+gv('ftPx'),fee=+(gv('ftFee')||0),note=gv('ftNote');
+  if(!sym){toast('⚠️ เลือกหุ้น');return;}
+  if(!date){toast('⚠️ เลือกวันที่');return;}
+  if(!vol||vol<=0){toast('⚠️ ใส่จำนวน (ต้องมากกว่า 0)');return;}
+  if(!px||px<=0){toast('⚠️ ใส่ราคา (ต้องมากกว่า 0)');return;}
+  load('กำลังบันทึก...');
+  try{
+    const r=await callAPI('addTx',{symbol:sym,type,date,volume:vol,price:px,fee,note});
+    D.transactions.push({id:r.id,symbol:sym,type,date,volume:vol,price:px,fee,note});
+    persist(); closeM('mTx'); renderAll();
+    toast(`✅ บันทึก ${type} ${sym} จำนวน ${f(vol,0)} @ ฿${px}`);
+  }catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+async function submitEq(){
+  const date=gv('feDate'),amt=+gv('feAmt'),note=gv('feNote');
+  if(!date){toast('⚠️ เลือกวันที่');return;}
+  if(!amt||amt<=0){toast('⚠️ ใส่จำนวนเงิน (ต้องมากกว่า 0)');return;}
+  load('กำลังบันทึก...');
+  try{
+    const r=await callAPI('addEquity',{date,amount:amt,note});
+    D.equity.push({id:r.id,date,amount:amt,note});
+    persist(); closeM('mEq'); renderDash(); renderDCA();
+    toast(`✅ บันทึก DCA ฿${f(amt)} สำเร็จ`);
+  }catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+async function submitDiv(){
+  const sym=gv('fdSym'),date=gv('fdDate'),amt=+gv('fdAmt'),note=gv('fdNote');
+  if(!sym){toast('⚠️ เลือกหุ้น');return;}
+  if(!date){toast('⚠️ เลือกวันที่');return;}
+  if(!amt||amt<=0){toast('⚠️ ใส่จำนวนเงิน');return;}
+  load('กำลังบันทึก...');
+  try{
+    const r=await callAPI('addDividend',{symbol:sym,date,amount:amt,note});
+    D.dividends.push({id:r.id,symbol:sym,date,amount:amt,note});
+    persist(); closeM('mDiv'); renderDash(); renderDiv();
+    toast(`✅ บันทึกปันผล ${sym} ฿${f(amt)} สำเร็จ`);
+  }catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+
+async function submitStock(){
+  const sym=gv('nsSym').toUpperCase(),name=gv('nsName')||sym,type=gv('nsType');
+  if(!sym){toast('⚠️ ใส่ symbol');return;}
+  if(D.stocks.find(s=>s.symbol===sym)){toast('⚠️ '+sym+' มีอยู่แล้ว');return;}
+  const color=(type==='crypto'?CCOL[sym]:null)||PAL[D.stocks.length%PAL.length];
   load('กำลังเพิ่ม '+sym+'...');
-  try {
-    const r = await api('addStock',{symbol:sym, name, color, type});
-    D.stocks.push({symbol:sym, name, color, type, id:r.id}); save();
-    closeM('mStock');
-    if (type === 'crypto') { await api('fetchCrypto',{}); await refreshAll(); }
-    else { fillSelects(); renderAll(); }
+  try{
+    const r=await callAPI('addStock',{symbol:sym,name,color,type});
+    D.stocks.push({id:r.id,symbol:sym,name,color,type});
+    persist(); closeM('mStock');
+    if(type==='crypto'){await doFetchCrypto();}else{fillSymSelects();renderAll();}
     toast(`✅ เพิ่ม ${sym} (${type==='crypto'?'คริปโต':'หุ้น'}) สำเร็จ`);
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+  }catch(e){toast('❌ '+e.message);}finally{unload();}
 }
 
-function openAddAlert() {
-  document.getElementById('alSym').value   = '';
-  document.getElementById('alPrice').value = '';
-  document.getElementById('alNote').value  = '';
-  openM('mAlert');
-}
-function quickAlert(sym) {
-  document.getElementById('alSym').value   = sym;
-  document.getElementById('alPrice').value = '';
-  document.getElementById('alNote').value  = '';
-  openM('mAlert');
-}
-async function submitAlert() {
-  const sym   = gv('alSym').trim().toUpperCase();
-  const cond  = gv('alCond');
-  const price = +gv('alPrice');
-  const note  = gv('alNote');
-  if (!sym)   { toast('⚠️ ใส่ symbol เช่น UPOIC, BTC'); return; }
-  if (!price || price <= 0) { toast('⚠️ ใส่ราคาเป้าหมาย'); return; }
+async function submitAlert(){
+  const sym=gv('alSym').toUpperCase(),cond=gv('alCond'),price=+gv('alPrice'),note=gv('alNote');
+  if(!sym){toast('⚠️ ใส่ symbol เช่น UPOIC, BTC');return;}
+  if(!price||price<=0){toast('⚠️ ใส่ราคาเป้าหมาย (ต้องมากกว่า 0)');return;}
   load('กำลังบันทึก alert...');
-  try {
-    const r = await api('addAlert',{symbol:sym, condition:cond, targetPrice:price, note});
-    D.alerts.push({id:r.id, symbol:sym, condition:cond, targetPrice:price, note, active:true, triggeredAt:'', createdAt:new Date().toISOString()});
-    save(); closeM('mAlert'); renderAlerts();
+  try{
+    const r=await callAPI('addAlert',{symbol:sym,condition:cond,targetPrice:price,note});
+    D.alerts.push({id:r.id,symbol:sym,condition:cond,targetPrice:price,note,active:true,triggeredAt:'',createdAt:new Date().toISOString()});
+    persist(); closeM('mAlert'); renderAlerts();
     toast(`✅ ตั้งเป้า ${sym} ${cond==='above'?'≥':'≤'} ฿${price} — LINE แจ้งเตือนอัตโนมัติ`);
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-async function delAlert(id) {
-  if (!confirm('ลบ alert นี้?')) return; load();
-  try { await api('deleteAlert',{id}); D.alerts=D.alerts.filter(a=>a.id!==id); save(); renderAlerts(); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-async function testLine() {
-  load('ส่ง Line Notify...');
-  try {
-    const r = await api('testLine',{});
-    toast(r.sent ? '✅ LINE Notify ส่งสำเร็จ! เช็คมือถือได้เลย 📱' : '❌ ส่งไม่ได้ — ตรวจสอบ LINE_NOTIFY_TOKEN ใน Script Properties');
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+  }catch(e){toast('❌ '+e.message);}finally{unload();}
 }
 
-async function delCrypto(id, sym) {
-  if (!confirm(`ลบ ${sym} ออกจากรายการ?`)) return; load();
-  try { await api('deleteStock',{id}); D.stocks=D.stocks.filter(s=>s.id!==id); save(); renderAll(); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
+// ════════════════════════════════
+//  DELETE
+// ════════════════════════════════
+async function delTx(id){
+  if(!confirm('ลบรายการนี้?'))return; load();
+  try{await callAPI('deleteTx',{id});D.transactions=D.transactions.filter(t=>t.id!==id);persist();renderTxs();renderDash();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+async function delEq(id){
+  if(!confirm('ลบ?'))return; load();
+  try{await callAPI('deleteEquity',{id});D.equity=D.equity.filter(e=>e.id!==id);persist();renderDash();renderDCA();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+async function delDiv(id){
+  if(!confirm('ลบ?'))return; load();
+  try{await callAPI('deleteDividend',{id});D.dividends=D.dividends.filter(d=>d.id!==id);persist();renderDiv();renderDash();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+async function delAlert(id){
+  if(!confirm('ลบ alert?'))return; load();
+  try{await callAPI('deleteAlert',{id});D.alerts=D.alerts.filter(a=>a.id!==id);persist();renderAlerts();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+async function delCrypto(id,sym){
+  if(!confirm('ลบ '+sym+'?'))return; load();
+  try{await callAPI('deleteStock',{id});D.stocks=D.stocks.filter(s=>s.id!==id);persist();renderAll();}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
 }
 
-async function savePrice(sym) {
-  const px = +(document.getElementById('pi-'+sym)?.value);
-  if (!px) return; load('อัพเดทราคา...');
-  try {
-    await api('setPrice',{symbol:sym,price:px,change:0,changePct:0});
-    D.prices[sym] = { price:px, change:0, changePct:0 }; save();
-    renderAll(); toast(`✅ อัพเดทราคา ${sym}`);
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-
-// ══════════════════════════════════════════════
-//  ACTIONS — PRICE FETCH
-// ══════════════════════════════════════════════
-async function triggerFetchPrices() {
+// ════════════════════════════════
+//  PRICE ACTIONS
+// ════════════════════════════════
+async function doFetchPrices(){
   load('🔄 ดึงราคาจาก Yahoo Finance...');
-  try { await api('fetchPrices',{}); await refreshAll(); toast('✅ อัพเดทราคาหุ้นสำเร็จ'); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
+  try{await callAPI('fetchPrices');await doRefresh();toast('✅ อัพเดทราคาหุ้นสำเร็จ');}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
 }
-async function triggerFetchCrypto() {
+async function doFetchCrypto(){
   load('🔄 ดึงราคาจาก Bitkub...');
-  try { await api('fetchCrypto',{}); await refreshAll(); toast('✅ อัพเดทราคาคริปโตสำเร็จ'); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
+  try{await callAPI('fetchCrypto');await doRefresh();toast('✅ อัพเดทราคาคริปโตสำเร็จ');}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
 }
-async function addCryptoWatch() {
-  const sym = (gv('newCryptoSym')).trim().toUpperCase();
-  if (!sym) { toast('⚠️ ใส่ symbol เช่น BTC, ETH'); return; }
-  if (D.stocks.find(s => s.symbol===sym)) { toast('⚠️ '+sym+' มีอยู่แล้ว'); return; }
-  const color = CCOLOR[sym] || PAL[D.stocks.length % PAL.length];
+async function addCrypto(){
+  const sym=(gv('newCrypto')).toUpperCase();
+  if(!sym){toast('⚠️ ใส่ symbol เช่น BTC, ETH');return;}
+  if(D.stocks.find(s=>s.symbol===sym)){toast('⚠️ '+sym+' มีอยู่แล้ว');return;}
+  const color=CCOL[sym]||PAL[D.stocks.length%PAL.length];
   load('กำลังเพิ่ม '+sym+'...');
-  try {
-    const r = await api('addStock',{symbol:sym, name:sym+' (Bitkub)', color, type:'crypto'});
-    D.stocks.push({symbol:sym, name:sym+' (Bitkub)', color, type:'crypto', id:r.id}); save();
-    await api('fetchCrypto',{});
-    await refreshAll();
-    document.getElementById('newCryptoSym').value = '';
+  try{
+    const r=await callAPI('addStock',{symbol:sym,name:sym+' (Bitkub)',color,type:'crypto'});
+    D.stocks.push({id:r.id,symbol:sym,name:sym+' (Bitkub)',color,type:'crypto'});
+    persist(); document.getElementById('newCrypto').value='';
+    await doFetchCrypto();
     toast('✅ เพิ่ม '+sym+' สำเร็จ');
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
+  }catch(e){toast('❌ '+e.message);}finally{unload();}
 }
+async function savePrice(sym){
+  const px=+(document.getElementById('pi-'+sym)?.value||0);
+  if(!px){toast('⚠️ ใส่ราคา');return;}load('อัพเดทราคา...');
+  try{
+    await callAPI('setPrice',{symbol:sym,price:px,change:0,changePct:0});
+    D.prices[sym]={...(D.prices[sym]||{}),price:px,change:0,changePct:0};
+    persist();renderAll();toast('✅ อัพเดทราคา '+sym+' เป็น ฿'+px);
+  }catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+async function doTestLine(){
+  load('ส่ง LINE Notify...');
+  try{const r=await callAPI('testLine');toast(r.sent?'✅ LINE Notify ส่งสำเร็จ! เช็คมือถือได้เลย 📱':'❌ ส่งไม่ได้ — ตรวจสอบ LINE_NOTIFY_TOKEN');}
+  catch(e){toast('❌ '+e.message);}finally{unload();}
+}
+function saveUrl(){const u=gv('cfgUrl');if(!u)return;localStorage.setItem(VER+'_url',u);APIURL=u;toast('✅ บันทึก URL สำเร็จ');doRefresh();}
+function clearCache(){if(!confirm('ล้าง cache?'))return;localStorage.removeItem(VER+'_d');D={stocks:[],transactions:[],equity:[],dividends:[],prices:{},alerts:[]};renderAll();toast('✅ ล้าง cache แล้ว — กด ↻ Sync');}
 
-// ══════════════════════════════════════════════
-//  ACTIONS — ALERTS
-// ══════════════════════════════════════════════
-function quickAlert(sym, currentPrice) {
-  document.getElementById('alSym').value  = sym;
-  document.getElementById('alPrice').value = '';
-  document.getElementById('alNote').value  = '';
-  openM('mAlert');
-}
-async function submitAlert() {
-  const sym   = gv('alSym').trim().toUpperCase();
-  const cond  = gv('alCond');
-  const price = +gv('alPrice');
-  const note  = gv('alNote');
-  if (!sym || !price) { toast('⚠️ ใส่ symbol และราคาเป้าหมาย'); return; }
-  load();
-  try {
-    const r = await api('addAlert',{symbol:sym, condition:cond, targetPrice:price, note});
-    D.alerts.push({id:r.id, symbol:sym, condition:cond, targetPrice:price, note, active:true, triggeredAt:'', createdAt:new Date().toISOString()});
-    save(); closeM('mAlert'); renderAlerts();
-    toast(`✅ ตั้งเป้า ${sym} ${cond==='above'?'≥':'≤'} ฿${price} แจ้งผ่าน Line`);
-  } catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-async function delAlert(id) {
-  if (!confirm('ลบ alert นี้?')) return; load();
-  try { await api('deleteAlert',{id}); D.alerts=D.alerts.filter(a=>a.id!==id); save(); renderAlerts(); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-async function testLine() {
-  load('ส่ง Line Notify...');
-  try { const r = await api('testLine',{}); toast(r.sent ? '✅ Line Notify ส่งสำเร็จ! เช็คมือถือได้เลย' : '❌ ส่งไม่ได้ — ตรวจสอบ LINE_NOTIFY_TOKEN'); }
-  catch(e) { toast('❌ '+e.message); } finally { unload(); }
-}
-
-// ══════════════════════════════════════════════
-//  STOCK DETAIL MODAL
-// ══════════════════════════════════════════════
-function openDet(sym) {
-  const h = hld(), x = h[sym]||{};
-  const txs  = D.transactions.filter(t => t.symbol===sym).sort((a,b) => new Date(b.date)-new Date(a.date));
-  const td   = D.dividends.filter(d => d.symbol===sym).reduce((s,d) => s+(+d.amount), 0);
-  const alts = D.alerts.filter(a => a.symbol===sym && String(a.active)!=='false');
-  const g    = x.pnl >= 0;
-  document.getElementById('detTitle').textContent = `📊 ${sym} — รายละเอียด`;
-  set('detBody', `
-    <div class="kgrid" style="grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px">
-      <div class="kpi k-b"><div class="kl">ราคาตลาด</div><div class="kv" style="color:var(--sky)">${fB(x.mp)}</div></div>
-      <div class="kpi ${g?'k-g':'k-r'}"><div class="kl">P&L %</div><div class="kv" style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</div></div>
-      <div class="kpi"><div class="kl">ถือ</div><div class="kv">${f(x.volume,0)}</div></div>
-      <div class="kpi k-y"><div class="kl">ปันผลรวม</div><div class="kv" style="color:var(--gold)">${fB(td)}</div></div>
+// ════════════════════════════════
+//  STOCK DETAIL
+// ════════════════════════════════
+function openDetail(sym){
+  const m=buildHoldings(),x=m[sym]||{};
+  const txs=D.transactions.filter(t=>t.symbol===sym).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const td=D.dividends.filter(d=>d.symbol===sym).reduce((s,d)=>s+(+d.amount),0);
+  const g=x.pnl>=0;
+  document.getElementById('detTitle').textContent=`📊 ${sym}`;
+  set('detBody',`
+    <div class="kg" style="grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:13px">
+      <div class="kpi kb"><div class="kl">ราคาตลาด</div><div class="kv" style="color:var(--sky)">${fB(x.mp)}</div></div>
+      <div class="kpi ${g?'kg2':'kr'}"><div class="kl">P&L %</div><div class="kv" style="color:${g?'var(--jade)':'var(--rose)'}">${g?'+':''}${f(x.pct)}%</div></div>
+      <div class="kpi"><div class="kl">ถือ</div><div class="kv">${f(x.vol,0)}</div></div>
+      <div class="kpi ky"><div class="kl">ปันผลรวม</div><div class="kv" style="color:var(--gold)">${fB(td)}</div></div>
     </div>
-    ${alts.length ? `<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px">
-      🔔 Alert ที่ active: ${alts.map(a=>`${a.condition==='above'?'≥':'≤'}฿${a.targetPrice}`).join(', ')}
-    </div>` : ''}
-    <div class="sec" style="font-size:10px">ประวัติ ${txs.length} รายการ</div>
-    <div style="max-height:230px;overflow-y:auto">
+    <div class="sec" style="font-size:9.5px">${txs.length} รายการ</div>
+    <div style="max-height:220px;overflow-y:auto">
       <table><thead><tr><th>วันที่</th><th>ประเภท</th><th>จำนวน</th><th>ราคา</th></tr></thead>
-      <tbody>${txs.slice(0,30).map(t => `<tr>
-        <td>${t.date}</td>
-        <td><span class="tag ${t.type==='Buy'?'tb':'ts'}">${t.type}</span></td>
-        <td>${f(t.volume,0)}</td><td>${fB(+t.price,3)}</td>
-      </tr>`).join('')}</tbody></table>
+      <tbody>${txs.slice(0,30).map(t=>`<tr><td>${t.date}</td>
+        <td><span class="tag ${t.type==='Buy'?'tbuy':'tsell'}">${t.type}</span></td>
+        <td>${f(t.volume,0)}</td><td>${fB(+t.price,3)}</td></tr>`).join('')}</tbody></table>
     </div>`);
   openM('mDet');
 }
 
-function saveUrl() { const u=gv('cfgUrl').trim(); localStorage.setItem(LS_URL,u); URL=u; toast('✅ บันทึก URL สำเร็จ'); refreshAll(); }
-function clearCache() {
-  if (!confirm('ล้าง cache ใน browser?')) return;
-  localStorage.removeItem(LS_CACHE);
-  D = { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[], crypto:{} };
-  renderAll(); toast('✅ ล้าง cache แล้ว — กด Sync ↻');
-}
-
-// ══════════════════════════════════════════════
+// ════════════════════════════════
 //  AI ANALYSIS
-// ══════════════════════════════════════════════
-async function analyzeAll() {
-  const btn = document.getElementById('aBtn');
-  btn.disabled = true; btn.textContent = '⏳ กำลังวิเคราะห์...';
-  document.getElementById('aiCards').innerHTML = '';
-  const active = D.stocks.filter(s => {
-    const h = hld(); return h[s.symbol] && h[s.symbol].volume > 0;
-  });
-  for (const s of active) await analyzeOne(s.symbol, s.name||'');
-  btn.disabled = false; btn.textContent = '🔍 วิเคราะห์ทั้งหมด';
+// ════════════════════════════════
+async function analyzeAll(){
+  const btn=document.getElementById('aBtn');btn.disabled=true;btn.textContent='⏳ กำลังวิเคราะห์...';
+  document.getElementById('aiCards').innerHTML='';
+  const m=buildHoldings();
+  const active=D.stocks.filter(s=>m[s.symbol]&&m[s.symbol].vol>0);
+  for(const s of active) await analyzeOne(s.symbol,s.name||'');
+  btn.disabled=false;btn.textContent='🔍 วิเคราะห์ทั้งหมด';
 }
 
-async function analyzeOne(sym, name) {
-  const h = hld(), x = h[sym]||{}, p = D.prices[sym]||{};
-  const td = D.dividends.filter(d => d.symbol===sym).reduce((s,d) => s+(+d.amount), 0);
-  const wrap = document.getElementById('aiCards');
-  const card = document.createElement('div'); card.className = 'aic';
-  card.innerHTML = `<div class="aihd">
-    <div>
-      <div class="aisym">${sym} <span style="font-size:11px;font-weight:400;color:var(--txt3)">${name}</span></div>
-      <div class="aimeta">฿${f(p.price)} · ถือ ${f(x.volume,0)} · P&L ${x.pnl>=0?'+':''}${f(x.pct)}%</div>
-    </div>
+async function analyzeOne(sym,name){
+  const m=buildHoldings(),x=m[sym]||{},p=D.prices[sym]||{};
+  const td=D.dividends.filter(d=>d.symbol===sym).reduce((s,d)=>s+(+d.amount),0);
+  const wrap=document.getElementById('aiCards');
+  const card=document.createElement('div');card.className='aic';
+  card.innerHTML=`<div class="aihd">
+    <div><div class="aisym">${sym} <span style="font-size:10.5px;font-weight:400;color:var(--txt3)">${name}</span></div>
+    <div class="aimeta">฿${f(p.price)} · ถือ ${f(x.vol,0)} · P&L ${x.pnl>=0?'+':''}${f(x.pct)}%</div></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-      <span class="badge bai">🤖 Claude AI</span>
-      <span id="rec-${sym}"></span>
+      <span class="badge bai">🤖 AI</span><span id="rec-${sym}"></span>
     </div>
   </div>
   <div class="ldg" id="ld-${sym}"><div class="sp"></div>กำลังวิเคราะห์จากข่าวล่าสุด...</div>
   <div class="ait" id="at-${sym}" style="display:none"></div>`;
   wrap.appendChild(card);
 
-  const isCrypto = D.stocks.find(s => s.symbol===sym)?.type === 'crypto';
-  const market = isCrypto ? 'ตลาดคริปโต (Bitkub Thailand)' : 'ตลาดหุ้นไทย SET';
-  const prompt = `คุณเป็นนักวิเคราะห์การลงทุน${isCrypto?'คริปโต':'SET'} ผู้เชี่ยวชาญ วิเคราะห์ ${sym}${name?' ('+name+')':''} ใน${market}
+  const isCrypto=D.stocks.find(s=>s.symbol===sym)?.type==='crypto';
+  const prompt=`คุณเป็นนักวิเคราะห์การลงทุน${isCrypto?'คริปโต':'SET'} ผู้เชี่ยวชาญ วิเคราะห์ ${sym}${name?' ('+name+')':''} ใน${isCrypto?'ตลาดคริปโต Bitkub':'ตลาดหุ้นไทย SET'}
 
-ข้อมูลพอร์ตนักลงทุน:
-• ราคาตลาด: ฿${f(p.price)} | ถือ: ${f(x.volume,0)} | ต้นทุนเฉลี่ย: ฿${f(x.avg,3)}
-• กำไร/ขาดทุน: ${x.pnl>=0?'+':''}฿${f(x.pnl)} (${x.pnl>=0?'+':''}${f(x.pct)}%)
-• ปันผล/ผลตอบแทนสะสม: ฿${f(td)}
+ข้อมูลพอร์ต: ราคา ฿${f(p.price)} | ถือ ${f(x.vol,0)} | ต้นทุน ฿${f(x.avg,3)} | P&L ${x.pnl>=0?'+':''}฿${f(x.pnl)} (${f(x.pct)}%) | ปันผลสะสม ฿${f(td)}
 
 ค้นหาข่าวล่าสุดของ ${sym} แล้ววิเคราะห์ 4 ด้าน (ภาษาไทย ≤200 คำ):
-**📊 ธุรกิจ/ภาพรวม** — สรุปสั้น
-**📰 ข่าว/ปัจจัยปัจจุบัน** — สิ่งกระทบราคาตอนนี้
-**🎯 คำแนะนำ** — ถือ / ซื้อเพิ่ม / ขายบางส่วน / ขาย พร้อมเหตุผล
-**⚠️ ความเสี่ยงหลัก** — 2-3 ข้อสำคัญ`;
+**📊 ธุรกิจ/ภาพรวม** **📰 ข่าว/ปัจจัย** **🎯 คำแนะนำ** (ถือ/ซื้อเพิ่ม/ขายบางส่วน/ขาย) **⚠️ ความเสี่ยง**`;
 
-  try {
-    const data = await api('analyzeStock', { symbol:sym, prompt });
-    let txt = (data.text||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-    const lo = txt.toLowerCase();
-    const rec = lo.includes('ซื้อเพิ่ม') || (lo.includes('ซื้อ')&&!lo.includes('ขาย')) ? 'buy'
-              : lo.includes('ขาย') ? 'sell' : 'hold';
-    set('rec-'+sym, `<span class="badge ${rec==='buy'?'bb2':rec==='sell'?'bs2':'bh'}">${rec==='buy'?'🟢 ซื้อ/เพิ่ม':rec==='sell'?'🔴 ขาย':'🟡 ถือ'}</span>`);
-    document.getElementById('ld-'+sym).style.display = 'none';
-    const ae = document.getElementById('at-'+sym); ae.style.display='block'; ae.innerHTML = txt;
-  } catch(e) {
-    const hint = (e.message||'').includes('ANTHROPIC_API_KEY')
-      ? '⚙️ ยังไม่ได้ตั้งค่า API Key — ดูคำแนะนำด้านบน'
-      : `❌ ${e.message}`;
-    document.getElementById('ld-'+sym).innerHTML = `<span style="color:var(--rose)">${hint}</span>`;
+  try{
+    const data=await callAPI('analyzeStock',{symbol:sym,prompt});
+    let txt=(data.text||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    const lo=txt.toLowerCase();
+    const rec=lo.includes('ซื้อเพิ่ม')||(lo.includes('ซื้อ')&&!lo.includes('ขาย'))?'buy':lo.includes('ขาย')?'sell':'hold';
+    set('rec-'+sym,`<span class="badge ${rec==='buy'?'bbuy':rec==='sell'?'bsell':'bhold'}">${rec==='buy'?'🟢 ซื้อ/เพิ่ม':rec==='sell'?'🔴 ขาย':'🟡 ถือ'}</span>`);
+    document.getElementById('ld-'+sym).style.display='none';
+    const ae=document.getElementById('at-'+sym);ae.style.display='block';ae.innerHTML=txt;
+  }catch(e){
+    document.getElementById('ld-'+sym).innerHTML=`<span style="color:var(--rose)">❌ ${(e.message||'').includes('ANTHROPIC_API_KEY')?'ยังไม่ได้ตั้งค่า API Key':e.message}</span>`;
   }
 }
 
-// ══════════════════════════════════════════════
-//  SEED DATA (import ครั้งแรก)
-// ══════════════════════════════════════════════
-function buildSeed() {
-  const u = () => Math.random().toString(36).substr(2,9);
-  const stocks = [
-    {id:u(),symbol:'UPOIC',name:'Union Pioneer Oil International',color:'#3b82f6',type:'stock'},
-    {id:u(),symbol:'SC',   name:'SC Asset Corporation',           color:'#10b981',type:'stock'},
-    {id:u(),symbol:'SIRI', name:'Sansiri Public Company',         color:'#f59e0b',type:'stock'},
-    {id:u(),symbol:'SCAP', name:'Seamico Capital',                color:'#8b5cf6',type:'stock'},
-  ];
-  const prices = {
-    UPOIC:{price:7.60,change:0.50,changePct:7.04},
-    SC:   {price:1.97,change:-0.02,changePct:-1.01},
-    SIRI: {price:1.41,change:-0.03,changePct:-2.08},
-    SCAP: {price:1.07,change:0,changePct:0},
-  };
-  const T = (d,s,tp,v,p,n='DCA') => ({id:u(),date:d,symbol:s,type:tp,volume:v,price:p,fee:0,note:n});
-  const transactions = [
-    T('2025-02-25','UPOIC','Buy',31200,6.468,'Initial'),T('2025-03-03','UPOIC','Buy',100,6.8113),T('2025-03-04','UPOIC','Buy',100,6.8113),T('2025-03-31','UPOIC','Buy',400,6.31065),T('2026-02-13','UPOIC','Buy',100,6.8114),T('2026-02-17','UPOIC','Buy',100,6.6612),T('2026-02-20','UPOIC','Buy',100,6.7112),
-    T('2025-02-25','SC','Buy',13800,3.463,'Initial'),T('2025-03-03','SC','Buy',100,2.5043),T('2025-03-03','SC','Buy',100,2.5243),T('2025-03-03','SC','Buy',200,2.5443),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.5043),T('2025-03-04','SC','Buy',100,2.4841),T('2025-03-06','SC','Buy',100,2.5243),T('2025-03-06','SC','Buy',100,2.5243),T('2025-03-30','SC','Buy',400,2.404),T('2026-02-13','SC','Buy',200,1.9032),T('2026-02-13','SC','Buy',100,1.8931),T('2026-02-13','SC','Buy',100,1.8831),T('2026-02-13','SC','Buy',100,1.8731),T('2026-02-17','SC','Buy',100,1.9432),T('2026-02-18','SC','Buy',100,2.0633),T('2026-02-20','SC','Buy',200,2.0434),
-    T('2025-02-25','SIRI','Buy',11200,1.7514,'Initial'),T('2025-03-03','SIRI','Buy',100,1.6728),T('2025-03-03','SIRI','Buy',300,1.6828),T('2025-03-04','SIRI','Buy',100,1.6828),T('2025-03-06','SIRI','Buy',100,1.6928),T('2025-03-06','SIRI','Buy',100,1.6928),T('2025-03-30','SIRI','Buy',300,1.4525),T('2025-03-30','SIRI','Buy',100,1.4425),T('2026-02-09','SIRI','Buy',100,1.4224),T('2026-02-09','SIRI','Buy',100,1.4124),T('2026-02-10','SIRI','Buy',100,1.4224),T('2026-02-13','SIRI','Buy',200,1.4625),T('2026-02-13','SIRI','Buy',100,1.4525),T('2026-02-18','SIRI','Buy',100,1.5226),T('2026-02-18','SIRI','Buy',100,1.5127),T('2026-02-20','SIRI','Buy',100,1.5626),T('2026-02-23','SIRI','Buy',100,1.5727),
-    T('2025-01-24','SCAP','Buy',16,2.28375,'Initial'),
-    T('2024-02-25','AIT','Buy',1500,4.2899,'Historical'),T('2025-03-04','AIT','Buy',100,4.5076,'Historical'),T('2025-03-04','AIT','Buy',100,4.4875,'Historical'),T('2025-03-30','AIT','Buy',400,4.6077,'Historical'),
-    T('2026-04-20','AIT','Sell',2100,4.88,'ขายหมด'),
-  ];
-  const E = (d,a,n='DCA') => ({id:u(),date:d,amount:a,note:n});
-  const equity = [
-    E('2018-03-02',1000),E('2018-03-28',1000),E('2018-04-17',500),E('2018-05-03',900),E('2018-05-10',1300),E('2018-05-17',500),E('2018-05-28',1000),E('2018-06-05',800),E('2018-06-27',1000),E('2018-06-29',800),E('2018-07-26',1000),E('2018-08-29',1000),E('2018-09-11',600),E('2018-09-12',1000),E('2018-09-28',1000),E('2018-10-05',500),E('2018-10-25',1000),E('2018-11-28',1000),E('2018-12-24',100),E('2018-12-28',1000),
-    E('2019-01-11',600),E('2019-01-28',1000),E('2019-01-30',500),E('2019-02-28',1000),E('2019-03-01',1000),E('2019-03-28',1000),E('2019-04-26',1000),E('2019-05-28',1000),E('2019-06-28',1000),E('2019-07-26',1000),E('2019-08-28',1000),E('2019-09-27',1000),E('2019-10-28',1000),E('2019-11-19',1000),E('2019-11-28',2000),E('2019-12-27',2000),
-    E('2020-01-22',1000),E('2020-01-28',2000),E('2020-02-28',2000),E('2020-03-27',2000),E('2020-04-28',2000),E('2020-05-28',2000),E('2020-06-25',2000),E('2020-07-24',2000),E('2020-08-28',2000),E('2020-09-28',2000),E('2020-10-28',2000),E('2020-11-27',2000),E('2020-12-28',2000),
-    E('2021-01-28',2000),E('2021-02-25',2000),E('2021-03-26',2000),E('2021-04-28',2000),E('2021-05-28',2000),E('2021-06-28',2000),E('2021-07-27',3000),E('2021-08-27',3000),E('2021-09-28',3000),E('2021-10-28',3000),E('2021-11-26',3000),E('2021-12-28',3000),
-    E('2022-01-31',3000),E('2022-02-28',3000),E('2022-03-28',3000),E('2022-04-28',3000),E('2022-05-27',3000),E('2022-06-28',3000),E('2022-07-27',3000),E('2022-08-26',3000),E('2022-09-28',3000),E('2022-10-28',3000),E('2022-11-28',3000),E('2022-12-28',3000),
-    E('2023-01-27',3000),E('2023-02-28',3000),E('2023-03-28',3000),E('2023-04-28',3000),E('2023-05-03',7000),E('2023-05-28',4000),E('2023-06-30',4000),E('2023-07-29',4000),E('2023-08-31',4000),E('2023-09-29',4000),E('2023-10-30',4000),E('2023-11-29',4000),E('2023-12-27',4000),
-    E('2024-01-29',4000),E('2024-02-28',4000),E('2024-03-28',4000),E('2024-04-30',5000),E('2024-05-23',8791.4),E('2024-05-31',5000),E('2024-07-01',5000),E('2024-07-30',5000),E('2024-08-28',5000),E('2024-09-30',5000),E('2024-11-01',5000),E('2024-12-02',5000),
-    E('2025-01-02',6000),E('2025-02-03',6000),E('2025-03-03',6000),E('2026-01-09',5000),
-  ];
-  const D2 = (d,s,a,n='') => ({id:u(),date:d,symbol:s,amount:a,note:n});
-  const dividends = [
-    D2('2023-05-03','UPOIC',7000,'ปันผลประจำปี'),D2('2024-05-20','SIRI',441,'ปันผล'),
-    D2('2024-05-21','SC',979.2,'ปันผล'),D2('2024-05-21','UPOIC',7371.2,'ปันผล'),
-    D2('2024-09-09','SIRI',459,'ปันผล'),D2('2024-09-11','SC',516.6,'ปันผล'),
-    D2('2025-04-30','AIT',756,'ปันผล (ก่อนขาย)'),D2('2025-04-30','UPOIC',9357.2,'ปันผล'),
-    D2('2025-04-30','SIRI',856.8,'ยังไม่โอนเข้าพอร์ต'),D2('2025-04-30','SC',1504.8,'ปันผล'),
-    D2('2025-04-30','SC',3591.62,'Tax Refund'),
-  ];
-  return { stocks, transactions, equity, dividends, prices };
-}
-
-// ══════════════════════════════════════════════
+// ════════════════════════════════
 //  INIT
-// ══════════════════════════════════════════════
-window.addEventListener('load', () => {
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
-  s.onload = () => {
-    if (URL) {
-      document.getElementById('setupScreen').style.display = 'none';
+// ════════════════════════════════
+window.addEventListener('load',()=>{
+  // live total update for tx modal
+  ['ftVol','ftPx','ftFee'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('input',()=>{
+      const v=+gv('ftVol'),p=+(gv('ftPx')||0),fee2=+(gv('ftFee')||0);
+      set('ftTotal','฿'+f(v*p+fee2));
+    });
+  });
+
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+  s.onload=()=>{
+    if(APIURL){
+      document.getElementById('setup').style.display='none';
       document.getElementById('app').classList.add('on');
       renderAll();    // render จาก cache ก่อน
-      refreshAll();   // sync จาก Sheets
-      // auto-sync ทุก 2 นาที
-      setInterval(refreshAll, 120000);
-      // auto-fetch ราคา Yahoo Finance + Bitkub ทุก 15 นาที
-      setInterval(async () => {
-        try { await api('fetchPrices',{}); await api('fetchCrypto',{}); await refreshAll(); }
-        catch(e) { /* silent */ }
+      doRefresh();    // sync จาก Sheets
+      setInterval(doRefresh, 120000);  // auto-sync ทุก 2 นาที
+      setInterval(async()=>{ // auto-fetch ราคาทุก 15 นาที
+        try{await callAPI('fetchPrices');await callAPI('fetchCrypto');await doRefresh();}catch(e){}
       }, 900000);
     }
   };
