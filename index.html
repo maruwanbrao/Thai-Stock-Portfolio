@@ -211,26 +211,41 @@ select option{background:var(--bg2)}
 </head>
 <body>
 
-<!-- SETUP -->
-<div id="setup">
+<!-- SETUP — แสดงเฉพาะตอนยังไม่มี URL ใน code -->
+<div id="setup" style="display:none">
 <div class="sbox">
   <div class="slogo">📈</div>
   <div class="stitle">ThaiPortfolio</div>
-  <div class="ssub">หุ้น + คริปโต + แจ้งเตือน LINE — Sync ทุกอุปกรณ์</div>
+  <div class="ssub">ใส่ Apps Script URL เพื่อเชื่อมต่อ Google Sheets</div>
+
+  <!-- ขั้นตอนสั้นๆ -->
   <div class="steps">
-    <div class="step"><div class="sn">1</div><div class="stxt"><b>สร้าง Google Sheets</b><p>ไปที่ <a href="https://sheets.new" target="_blank" style="color:var(--sky)">sheets.new</a> → สร้าง Spreadsheet ใหม่</p></div></div>
-    <div class="step"><div class="sn">2</div><div class="stxt"><b>วาง Code.gs</b><p><code>Extensions</code> → <code>Apps Script</code> → วาง Code.gs ทั้งหมด → Save</p></div></div>
-    <div class="step"><div class="sn">3</div><div class="stxt"><b>Run firstTimeSetup</b><p>dropdown เลือก <code>firstTimeSetup</code> → ▶ เรียกใช้ → อนุญาต</p></div></div>
-    <div class="step"><div class="sn">4</div><div class="stxt"><b>Deploy Web App</b><p><code>Deploy</code> → <code>New deployment</code> → Web app<br>Execute as: <b>Me</b> | Access: <b>Anyone</b> → คัดลอก URL</p></div></div>
+    <div class="step"><div class="sn">1</div><div class="stxt">
+      <b>เปิด Code.gs ใน Apps Script</b>
+      <p>บรรทัดแรกของ <code>index.html</code> มีคำอธิบายขั้นตอนทั้งหมด<br>
+      หรือดูที่ comments ใน <code>Code.gs</code></p>
+    </div></div>
+    <div class="step"><div class="sn">2</div><div class="stxt">
+      <b>Deploy → Web App → คัดลอก URL</b>
+      <p>Execute as: <b>Me</b> | Access: <b>Anyone</b><br>
+      วาง URL ด้านล่าง แล้วกด เชื่อมต่อ</p>
+    </div></div>
   </div>
+
   <div class="fg">
     <label>Apps Script Web App URL</label>
     <div style="display:flex;gap:7px">
-      <input type="url" id="setupUrl" placeholder="https://script.google.com/macros/s/…/exec">
-      <button class="btn btb" onclick="doConnect()">เชื่อมต่อ</button>
+      <input type="url" id="setupUrl" placeholder="https://script.google.com/macros/s/…/exec"
+        style="font-size:12px">
+      <button class="btn btb" onclick="connectFromSetup()" style="white-space:nowrap">เชื่อมต่อ</button>
     </div>
   </div>
-  <div style="font-size:11px;color:var(--txt3);margin-top:5px">⚡ import ข้อมูลประวัติทั้งหมดจาก Excel อัตโนมัติครั้งแรก</div>
+
+  <!-- คำแนะนำฝัง URL ในโค้ด -->
+  <div style="background:var(--bg2);border:1px solid var(--rim);border-radius:8px;padding:11px 13px;font-size:11.5px;color:var(--txt2);line-height:1.7">
+    💡 <b style="color:var(--sky)">วิธีที่ดีกว่า:</b> แก้ไฟล์ <code>index.html</code> บรรทัด <code>APPS_SCRIPT_URL</code><br>
+    ใส่ URL ลงใน code โดยตรง จะไม่ต้องตั้งค่าซ้ำทุกครั้ง
+  </div>
 </div>
 </div>
 
@@ -504,64 +519,126 @@ select option{background:var(--bg2)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════
-//  STATE
-// ════════════════════════════════
-const VER   = 'tp_v7';
-const PAL   = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#fb7185','#a3e635','#f97316','#ec4899'];
-const CCOL  = {BTC:'#f7931a',ETH:'#627eea',XRP:'#00aae4',DOGE:'#c2a633',ADA:'#8b5cf6',BNB:'#f3ba2f',SOL:'#9945ff',USDT:'#26a17b',MATIC:'#8247e5'};
+// ════════════════════════════════════════════════════════════
+//  ThaiPortfolio — Frontend JavaScript
+//  แก้ไขได้ตรงนี้:
+//
+//  1) APPS_SCRIPT_URL  ← ใส่ URL จาก Apps Script Deploy ที่นี่
+//  2) PAL              ← สีของหุ้นแต่ละตัว
+//  3) CCOL             ← สีของคริปโตแต่ละตัว
+// ════════════════════════════════════════════════════════════
 
-let APIURL = localStorage.getItem(VER+'_url') || '';
+// ─────────────────────────────────────────────────────────────
+//  ⚙️  ตั้งค่า URL ตรงนี้เลย (แก้ไขบรรทัดนี้อย่างเดียว)
+//  วิธีได้ URL: Apps Script → Deploy → Manage deployments → URL
+// ─────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/ใส่-URL-ของคุณ-ตรงนี้/exec';
+
+// ─────────────────────────────────────────────────────────────
+//  สี palette สำหรับหุ้น (ถ้าเพิ่มหุ้นใหม่จะใช้สีถัดไปอัตโนมัติ)
+// ─────────────────────────────────────────────────────────────
+const PAL  = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#fb7185','#a3e635','#f97316','#ec4899'];
+
+// ─────────────────────────────────────────────────────────────
+//  สีประจำคริปโตแต่ละตัว (เพิ่มได้ตามต้องการ)
+// ─────────────────────────────────────────────────────────────
+const CCOL = {
+  BTC:'#f7931a', ETH:'#627eea', XRP:'#00aae4', DOGE:'#c2a633',
+  ADA:'#8b5cf6', BNB:'#f3ba2f', SOL:'#9945ff', USDT:'#26a17b',
+  MATIC:'#8247e5', LINK:'#2a5ada', DOT:'#e6007a', SHIB:'#ffa409',
+};
+
+// ─────────────────────────────────────────────────────────────
+//  Cache key สำหรับ localStorage (เพิ่มเลขถ้าต้องการ reset cache)
+// ─────────────────────────────────────────────────────────────
+const VER = 'tp_v8';
+
+// ─────────────────────────────────────────────────────────────
+//  APIURL — อ่านจาก code ก่อน ถ้าไม่มีค่อยดูจาก localStorage
+//  (ให้ยืดหยุ่น: เปลี่ยนจาก config page ได้ด้วย)
+// ─────────────────────────────────────────────────────────────
+let APIURL = APPS_SCRIPT_URL.includes('ใส่-URL') 
+  ? (localStorage.getItem(VER+'_url') || '')
+  : APPS_SCRIPT_URL;
+
+// ─────────────────────────────────────────────────────────────
+//  DATA STORE — โหลดจาก localStorage เป็น cache
+//  ข้อมูลจริงอยู่ใน Google Sheets, cache ช่วยให้โหลดเร็ว
+// ─────────────────────────────────────────────────────────────
 let D = (() => {
-  try{ const r=localStorage.getItem(VER+'_d'); return r?JSON.parse(r):null; }catch(e){}
+  try {
+    const r = localStorage.getItem(VER+'_d');
+    return r ? JSON.parse(r) : null;
+  } catch(e) {}
   return null;
 })() || { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[] };
+
+// บันทึก cache ลง localStorage
 const persist = () => localStorage.setItem(VER+'_d', JSON.stringify(D));
 
-// ════════════════════════════════
-//  API  — ส่งเป็น GET เสมอ
-//  Apps Script รับ POST JSON ได้แต่ redirect บางครั้ง
-//  ใช้ GET param แทนเพื่อความเชื่อถือได้
-// ════════════════════════════════
+// ─────────────────────────────────────────────────────────────
+//  callAPI — เรียก Apps Script ด้วย GET request
+//  เหตุที่ใช้ GET: Apps Script อาจ redirect POST ทำให้ fail
+//  GET query string ใช้งานได้เสมอ ไม่มีปัญหา CORS
+// ─────────────────────────────────────────────────────────────
 async function callAPI(action, params={}) {
-  if (!APIURL) throw new Error('ยังไม่ได้ตั้งค่า URL');
+  if (!APIURL || APIURL.includes('ใส่-URL')) {
+    throw new Error('กรุณาใส่ Apps Script URL ใน code (บรรทัด APPS_SCRIPT_URL) หรือในหน้า ⚙️ ตั้งค่า');
+  }
 
-  // สร้าง query string
+  // สร้าง URL พร้อม query parameters
   const qs = new URLSearchParams({ action });
   Object.keys(params).forEach(k => {
     const v = params[k];
+    // ถ้าเป็น object/array ให้แปลงเป็น JSON string ก่อน
     qs.set(k, typeof v === 'object' ? JSON.stringify(v) : String(v));
   });
 
   const url = APIURL + '?' + qs.toString();
-  const r   = await fetch(url, { redirect: 'follow' });
-  const txt = await r.text();
 
-  // หา JSON ในข้อความ (Apps Script บางครั้งมี whitespace นำหน้า)
+  let txt;
+  try {
+    const r = await fetch(url, { redirect: 'follow' });
+    txt = await r.text();
+  } catch(e) {
+    throw new Error('เชื่อมต่อ Apps Script ไม่ได้: ' + e.message);
+  }
+
+  // หา JSON ในข้อความ (Apps Script อาจมี whitespace หรือ BOM นำหน้า)
   const start = txt.indexOf('{');
-  if (start < 0) throw new Error('Response ไม่ใช่ JSON: ' + txt.substr(0,100));
-  const j = JSON.parse(txt.substr(start));
-  if (!j.ok) throw new Error(j.error || 'API error');
+  if (start < 0) throw new Error('Apps Script ไม่ได้ส่ง JSON กลับมา: ' + txt.substr(0,120));
+
+  let j;
+  try { j = JSON.parse(txt.substr(start)); }
+  catch(e) { throw new Error('JSON parse error: ' + txt.substr(start, 100)); }
+
+  if (!j.ok) throw new Error(j.error || 'Apps Script error');
   return j.data;
 }
 
-// ════════════════════════════════
-//  CONNECT / SYNC
-// ════════════════════════════════
-async function doConnect() {
-  const url = document.getElementById('setupUrl').value.trim();
-  if (!url.includes('script.google.com')) { toast('⚠️ URL ไม่ถูกต้อง'); return; }
-  localStorage.setItem(VER+'_url', url); APIURL = url;
+// ─────────────────────────────────────────────────────────────
+//  CONNECT — เรียกจากหน้า Setup (กรณียังไม่ได้ฝัง URL ในโค้ด)
+// ─────────────────────────────────────────────────────────────
+async function connectFromSetup() {
+  const url = (document.getElementById('setupUrl')?.value || '').trim();
+  if (!url.includes('script.google.com')) {
+    toast('⚠️ URL ไม่ถูกต้อง — ต้องเป็น script.google.com/macros/s/.../exec'); return;
+  }
+  localStorage.setItem(VER+'_url', url);
+  APIURL = url;
   load('กำลังเชื่อมต่อและ import ข้อมูล...');
   try {
-    // seed ส่งผ่าน GET โดย encode เป็น JSON string
-    await callAPI('seed', { force: false });
+    await callAPI('seed', { force: false });  // import ประวัติครั้งแรก
     await syncData();
     document.getElementById('setup').style.display = 'none';
     document.getElementById('app').classList.add('on');
+    renderAll();
     toast('✅ เชื่อมต่อสำเร็จ!');
+    setInterval(doRefresh, 120000);
+    setInterval(async()=>{try{await callAPI('fetchPrices');await callAPI('fetchCrypto');await doRefresh();}catch(e){}}, 900000);
   } catch(e) { toast('❌ ' + e.message); } finally { unload(); }
 }
+const doConnect = connectFromSetup; // backward compat
 
 async function syncData() {
   const data = await callAPI('getAll');
@@ -1105,35 +1182,82 @@ async function analyzeOne(sym,name){
   }
 }
 
-// ════════════════════════════════
-//  INIT
-// ════════════════════════════════
-window.addEventListener('load',()=>{
-  // live total update for tx modal
-  ['ftVol','ftPx','ftFee'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.addEventListener('input',()=>{
-      const v=+gv('ftVol'),p=+(gv('ftPx')||0),fee2=+(gv('ftFee')||0);
-      set('ftTotal','฿'+f(v*p+fee2));
+// ════════════════════════════════════════════════════════════
+//  INIT — เริ่มต้นแอพ
+// ════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+
+  // ── แนบ event live-preview มูลค่ารวมใน modal ซื้อขาย ──
+  ['ftVol','ftPx','ftFee'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      const v=+(gv('ftVol')||0), p=+(gv('ftPx')||0), fee2=+(gv('ftFee')||0);
+      set('ftTotal', '฿' + f(v*p + fee2));
     });
   });
 
-  const s=document.createElement('script');
-  s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
-  s.onload=()=>{
-    if(APIURL){
-      document.getElementById('setup').style.display='none';
-      document.getElementById('app').classList.add('on');
-      renderAll();    // render จาก cache ก่อน
-      doRefresh();    // sync จาก Sheets
-      setInterval(doRefresh, 120000);  // auto-sync ทุก 2 นาที
-      setInterval(async()=>{ // auto-fetch ราคาทุก 15 นาที
-        try{await callAPI('fetchPrices');await callAPI('fetchCrypto');await doRefresh();}catch(e){}
-      }, 900000);
-    }
+  // ── โหลด Chart.js แล้วเริ่มแอพ ──
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+  s.onload = () => startApp();
+  s.onerror = () => {
+    // Chart.js โหลดไม่ได้ — เริ่มแอพต่อโดยไม่มีกราฟ
+    console.warn('Chart.js โหลดไม่ได้ — แอพยังทำงานได้ปกติ');
+    startApp();
   };
   document.head.appendChild(s);
 });
+
+function startApp() {
+  // ── ตรวจว่ามี URL หรือยัง ──
+  if (APIURL && !APIURL.includes('ใส่-URL')) {
+    // มี URL แล้ว — ข้ามหน้า setup เลย
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('app').classList.add('on');
+
+    renderAll();   // แสดงข้อมูลจาก cache ก่อนเพื่อความเร็ว
+    doRefresh();   // sync จาก Google Sheets ทันที
+
+    // ── Auto-sync ทุก 2 นาที ──
+    setInterval(doRefresh, 120000);
+
+    // ── Auto-fetch ราคาหุ้น + คริปโต ทุก 15 นาที ──
+    setInterval(async () => {
+      try {
+        await callAPI('fetchPrices');  // Yahoo Finance
+        await callAPI('fetchCrypto');  // Bitkub
+        await doRefresh();
+      } catch(e) { /* silent — ไม่แสดง error ถ้าเน็ตหาย */ }
+    }, 900000); // 15 นาที = 900,000ms
+
+  } else {
+    // ยังไม่มี URL — แสดงหน้า setup แบบเรียบง่าย
+    document.getElementById('setup').style.display = 'flex';
+  }
+}
+
+// ── saveUrl (เรียกจากหน้า ⚙️ ตั้งค่า) ──
+// บันทึก URL ใหม่ลง localStorage แล้ว reload
+function saveUrl() {
+  const u = gv('cfgUrl');
+  if (!u || !u.includes('script.google.com')) {
+    toast('⚠️ URL ไม่ถูกต้อง — ต้องเป็น script.google.com/macros/s/.../exec');
+    return;
+  }
+  localStorage.setItem(VER+'_url', u);
+  APIURL = u;
+  toast('✅ บันทึก URL สำเร็จ — กำลัง Sync...');
+  doRefresh();
+}
+
+// ── clearCache ──
+function clearCache() {
+  if (!confirm('ล้าง cache ใน browser?\n(ข้อมูลใน Google Sheets ยังอยู่ครบ)')) return;
+  localStorage.removeItem(VER+'_d');
+  D = { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[] };
+  renderAll();
+  toast('✅ ล้าง cache แล้ว — กด ↻ Sync เพื่อโหลดข้อมูลใหม่');
+}
 </script>
 </body>
 </html>
