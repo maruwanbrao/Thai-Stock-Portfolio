@@ -66,13 +66,48 @@ code{font-family:var(--mono);font-size:11px;background:var(--bg);padding:1px 5px
 .pg{display:none}
 .pg.on{display:block}
 
-/* KPI */
-.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-bottom:16px}
-.kpi{background:var(--card);border:1px solid var(--rim);border-radius:var(--r);padding:12px 13px;position:relative;min-width:0;transition:border-color .2s,transform .2s}
+/* KPI GRID — ปรับ column อัตโนมัติตามความกว้าง */
+.kg{
+  display:grid;
+  /* minmax(0,1fr) ทำให้ card ไม่เกิน container เด็ดขาด */
+  grid-template-columns:repeat(auto-fill,minmax(min(160px,100%),1fr));
+  gap:10px;
+  margin-bottom:16px;
+}
+/* KPI card — ห้าม overflow ทุกกรณี */
+.kpi{
+  background:var(--card);
+  border:1px solid var(--rim);
+  border-radius:var(--r);
+  padding:12px 13px;
+  position:relative;
+  /* สำคัญ: min-width:0 ป้องกัน grid blowout */
+  min-width:0;
+  overflow:hidden;   /* ตัด content ที่ล้น */
+  transition:border-color .2s,transform .2s;
+}
 .kpi:hover{border-color:var(--rim2);transform:translateY(-2px)}
-.kl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:700}
-.kv{font-size:15px;font-weight:800;font-family:var(--mono);line-height:1.2}
-.ks{font-size:10px;margin-top:4px;color:var(--txt3)}
+/* label — ตัด ellipsis ถ้ายาวเกิน */
+.kl{
+  font-size:9px;color:var(--txt3);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:5px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* value — ตัวเลขหลัก: font ยืดหยุ่น ไม่ wrap */
+.kv{
+  /* clamp(min, preferred, max)
+     - min  = 12px (จอเล็กมาก)
+     - pref = 3.5vw (scale ตามจอ)
+     - max  = 18px (desktop) */
+  font-size:clamp(12px,3.5vw,18px);
+  font-weight:800;
+  font-family:var(--mono);
+  line-height:1.25;
+  white-space:nowrap;    /* ห้ามขึ้นบรรทัดใหม่ */
+  overflow:hidden;
+  text-overflow:ellipsis; /* ... ถ้าตัวเลขยาวเกิน card */
+}
+.ks{font-size:10px;margin-top:4px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kb{border-color:rgba(59,130,246,.3);background:linear-gradient(135deg,var(--card),rgba(59,130,246,.05))}
 .kg2{border-color:rgba(16,185,129,.3);background:linear-gradient(135deg,var(--card),rgba(16,185,129,.05))}
 .kr{border-color:rgba(239,68,68,.3);background:linear-gradient(135deg,var(--card),rgba(239,68,68,.05))}
@@ -194,19 +229,45 @@ select option{background:var(--bg2)}
 .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:9px}
 .pha{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 
+/* ─────────────────────────────────────────
+   kg-2 = KPI grid 2 คอลัมน์เท่านั้น
+   ใช้กับหน้าที่มี card แค่ 2 ใบ (DCA, ปันผล)
+   เต็มความกว้างเสมอ ไม่มี max-width
+───────────────────────────────────────── */
+.kg-2{
+  grid-template-columns:repeat(2,1fr) !important;
+  max-width:100%;
+}
+
+/* ── Responsive ─────────────────────────── */
+
+/* มือถือ ≤ 600px */
 @media(max-width:600px){
   .wrap{padding:10px}
+  /* KPI: 2 คอลัมน์เต็มความกว้าง ไม่มี max-width */
   .kg{grid-template-columns:repeat(2,1fr);gap:7px}
   .kpi{padding:10px 11px}
-  .kl{font-size:8.5px}
-  .kv{font-size:13px}
+  .kl{font-size:8px;letter-spacing:.6px}
+  /* clamp ให้ font เล็กลงบนมือถือ */
+  .kv{font-size:clamp(13px,4.5vw,17px)}
+  .ks{font-size:9.5px}
   .sg{grid-template-columns:1fr}
   .fr{grid-template-columns:1fr}
   .hdr{padding:0 10px}
   .nb{padding:9px 10px;font-size:11.5px}
 }
-@media(max-width:380px){.kv{font-size:12px}.kpi{padding:9px 9px}}
-@media(min-width:900px){.kg{grid-template-columns:repeat(6,1fr)}}
+
+/* จอเล็กมาก ≤ 380px */
+@media(max-width:380px){
+  .kv{font-size:clamp(11px,4vw,14px)}
+  .kpi{padding:9px 9px}
+}
+
+/* Desktop ≥ 900px — 6 คอลัมน์ */
+@media(min-width:900px){
+  .kg{grid-template-columns:repeat(6,1fr)}
+  .kv{font-size:16px} /* desktop: ขนาดคงที่ชัดเจน */
+}
 </style>
 </head>
 <body>
@@ -321,9 +382,10 @@ select option{background:var(--bg2)}
   <div class="ph"><div class="sec" style="margin:0">ประวัติโอนเงิน DCA</div>
     <button class="btn btb" onclick="openEqModal()" style="font-size:12px;padding:7px 12px">+ เพิ่ม</button>
   </div>
-  <div class="kg" style="max-width:460px">
-    <div class="kpi kb"><div class="kl">รวมทั้งหมด</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
-    <div class="kpi"><div class="kl">จำนวนครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
+  <!-- kg-2: grid 2 คอลัมน์เต็มความกว้าง ไม่ตัดตัวเลข -->
+  <div class="kg kg-2">
+    <div class="kpi kb"><div class="kl" title="รวมทั้งหมด">รวม</div><div class="kv" id="eqTot" style="color:var(--sky)">–</div></div>
+    <div class="kpi"><div class="kl" title="จำนวนครั้ง">ครั้ง</div><div class="kv" id="eqCnt" style="color:var(--txt2)">–</div></div>
   </div>
   <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="eqTbl"></tbody></table></div>
 </div>
@@ -333,9 +395,10 @@ select option{background:var(--bg2)}
   <div class="ph"><div class="sec" style="margin:0">เงินปันผล</div>
     <button class="btn btb" onclick="openDivModal()" style="font-size:12px;padding:7px 12px">+ บันทึก</button>
   </div>
-  <div class="kg" style="max-width:460px">
-    <div class="kpi ky"><div class="kl">รวมทั้งหมด</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
-    <div class="kpi kg2"><div class="kl">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
+  <!-- kg-2: grid 2 คอลัมน์เต็มความกว้าง ไม่ตัดตัวเลข -->
+  <div class="kg kg-2">
+    <div class="kpi ky"><div class="kl" title="รวมทั้งหมด">รวม</div><div class="kv" id="dvTot" style="color:var(--gold)">–</div></div>
+    <div class="kpi kg2"><div class="kl" title="ปีนี้">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
   </div>
   <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="dvTbl"></tbody></table></div>
 </div>
