@@ -170,8 +170,9 @@ td:first-child{font-family:var(--font);color:var(--txt)}
 .btg:hover{border-color:var(--sky);color:var(--sky)}
 .btd{background:var(--rose);color:#fff}
 .btd:hover{background:var(--rose2)}
-.btl{background:#06c755;color:#fff}
-.btl:hover{background:#05a848}
+/* Telegram button color */
+.bttg{background:#229ED9;color:#fff}
+.bttg:hover{background:#1a8ac4}
 .bs{padding:4px 9px;font-size:11px;border-radius:6px;border:1px solid var(--rim2);background:var(--card2);color:var(--txt2);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .13s}
 .bs:hover{border-color:var(--sky);color:var(--sky)}
 .bsbuy{background:rgba(16,185,129,.1);color:var(--jade);border-color:rgba(16,185,129,.3)}
@@ -406,20 +407,35 @@ select option{background:var(--bg2)}
 <!-- ALERTS -->
 <div class="pg" id="pg-alert">
   <div class="ph">
-    <div><div class="sec" style="margin:0 0 3px">🔔 แจ้งเตือน LINE Notify</div>
-    <div style="font-size:11px;color:var(--txt3)">แจ้งเตือนอัตโนมัติผ่าน LINE ทุก 15 นาที</div></div>
+    <div>
+      <div class="sec" style="margin:0 0 3px">🔔 แจ้งเตือนราคา (Telegram)</div>
+      <div style="font-size:11px;color:var(--txt3)">แจ้งเตือนอัตโนมัติผ่าน Telegram Bot ทุก 15 นาที — ฟรี</div>
+    </div>
     <div class="pha">
-      <button class="btn btl" onclick="doTestLine()" style="font-size:12px;padding:7px 12px">🔔 ทดสอบ LINE</button>
+      <!-- ปุ่มสีฟ้า Telegram -->
+      <button class="btn" onclick="doTestTelegram()"
+        style="background:#229ED9;color:#fff;font-size:12px;padding:7px 12px">
+        ✈️ ทดสอบ Telegram
+      </button>
       <button class="btn btb" onclick="openAlertModal(null)" style="font-size:12px;padding:7px 12px">+ ตั้งเป้า</button>
     </div>
   </div>
+
+  <!-- คำแนะนำตั้งค่า Telegram Bot -->
   <div class="ibox iblue" style="font-size:11.5px">
-    <b style="color:var(--sky)">⚙️ ตั้งค่า LINE Notify (ฟรี ครั้งเดียว)</b><br>
-    1. <a href="https://notify-bot.line.me/th/" target="_blank" style="color:var(--sky)">notify-bot.line.me</a> → เข้าสู่ระบบ → "สร้าง token" → เลือกห้องแชท<br>
-    2. Apps Script → ⚙️ Project Settings → Script properties → <code>LINE_NOTIFY_TOKEN</code> = token<br>
-    3. Deploy ใหม่ → กด "ทดสอบ LINE" → รอข้อความใน LINE ✅
+    <b style="color:var(--sky)">⚙️ ตั้งค่า Telegram Bot (ฟรี ครั้งเดียว ~3 นาที)</b><br>
+    <b>ขั้นที่ 1 — สร้าง Bot:</b> เปิด Telegram → ค้นหา <code>@BotFather</code> → พิมพ์ <code>/newbot</code> → ตั้งชื่อ → คัดลอก <b>Token</b><br>
+    <b>ขั้นที่ 2 — หา Chat ID:</b> เปิด bot ที่สร้าง → กด <b>Start</b> → เปิดเบราว์เซอร์ไปที่:<br>
+    &nbsp;&nbsp;<code>https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code> → หา <code>"chat":{"id":</code> คัดลอก id<br>
+    <b>ขั้นที่ 3 — ใส่ใน Apps Script:</b> ⚙️ Project Settings → Script properties → เพิ่ม 2 รายการ:<br>
+    &nbsp;&nbsp;<code>TELEGRAM_BOT_TOKEN</code> = Token จากขั้นที่ 1<br>
+    &nbsp;&nbsp;<code>TELEGRAM_CHAT_ID</code> = Chat ID จากขั้นที่ 2<br>
+    <b>ขั้นที่ 4:</b> Deploy ใหม่ → กด ✈️ ทดสอบ Telegram → รอข้อความใน Telegram ✅
   </div>
-  <div class="tw"><table><thead><tr><th>#</th><th>หุ้น</th><th>เงื่อนไข</th><th>ราคาเป้า</th><th>ราคาปัจจุบัน</th><th>สถานะ</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="alertTbl"></tbody></table></div>
+
+  <div class="tw"><table><thead><tr>
+    <th>#</th><th>หุ้น</th><th>เงื่อนไข</th><th>ราคาเป้า</th><th>ราคาปัจจุบัน</th><th>สถานะ</th><th>หมายเหตุ</th><th></th>
+  </tr></thead><tbody id="alertTbl"></tbody></table></div>
 </div>
 
 <!-- CRYPTO -->
@@ -458,20 +474,43 @@ select option{background:var(--bg2)}
 <div class="pg" id="pg-cfg">
   <div class="sec">⚙️ ตั้งค่า</div>
   <div class="cc">
-    <div class="fg"><label>Apps Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
-    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px">
+
+    <!-- Apps Script URL -->
+    <div class="fg">
+      <label>Apps Script Web App URL</label>
+      <input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec">
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
       <button class="btn btb" onclick="saveUrl()">💾 บันทึก URL</button>
-      <button class="btn btg" onclick="doRefresh()">↻ Sync</button>
+      <button class="btn btg" onclick="doRefresh()">↻ Sync ข้อมูล</button>
       <button class="btn btd" onclick="clearCache()">🗑 Clear Cache</button>
     </div>
+
+    <!-- Telegram -->
+    <div style="border-top:1px solid var(--rim);padding-top:14px;margin-bottom:18px">
+      <div class="sec" style="margin-bottom:10px">✈️ Telegram Bot</div>
+      <div class="ibox iblue" style="font-size:11.5px;margin-bottom:12px">
+        <b style="color:var(--sky)">Script Properties ที่ต้องตั้งค่า:</b><br>
+        &nbsp;• <code>TELEGRAM_BOT_TOKEN</code> — Token จาก @BotFather<br>
+        &nbsp;• <code>TELEGRAM_CHAT_ID</code> — Chat ID ของคุณหรือ Group<br>
+        Apps Script → ⚙️ Project Settings → Script properties → + Add property
+      </div>
+      <button class="btn" onclick="doTestTelegram()"
+        style="background:#229ED9;color:#fff;font-size:12.5px;padding:8px 16px">
+        ✈️ ทดสอบส่ง Telegram
+      </button>
+    </div>
+
+    <!-- Manual price update -->
     <div style="border-top:1px solid var(--rim);padding-top:14px">
-      <div class="sec" style="margin-bottom:10px">อัพเดทราคา Manual</div>
+      <div class="sec" style="margin-bottom:10px">🔄 อัพเดทราคา Manual</div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="btn btb" onclick="doFetchPrices()" style="font-size:12px;padding:7px 12px">🔄 Yahoo Finance</button>
-        <button class="btn btb" onclick="doFetchCrypto()" style="font-size:12px;padding:7px 12px">🔄 Bitkub</button>
+        <button class="btn btb" onclick="doFetchPrices()" style="font-size:12px;padding:7px 12px">🔄 Yahoo Finance (หุ้น)</button>
+        <button class="btn btb" onclick="doFetchCrypto()" style="font-size:12px;padding:7px 12px">🔄 Bitkub (คริปโต)</button>
       </div>
       <div id="manualPrices"></div>
     </div>
+
   </div>
 </div>
 
@@ -1162,11 +1201,20 @@ async function savePrice(sym){
     persist();renderAll();toast('✅ อัพเดทราคา '+sym+' เป็น ฿'+px);
   }catch(e){toast('❌ '+e.message);}finally{unload();}
 }
-async function doTestLine(){
-  load('ส่ง LINE Notify...');
-  try{const r=await callAPI('testLine');toast(r.sent?'✅ LINE Notify ส่งสำเร็จ! เช็คมือถือได้เลย 📱':'❌ ส่งไม่ได้ — ตรวจสอบ LINE_NOTIFY_TOKEN');}
-  catch(e){toast('❌ '+e.message);}finally{unload();}
+// ── Telegram test ─────────────────────────────
+async function doTestTelegram() {
+  load('✈️ กำลังส่ง Telegram...');
+  try {
+    const r = await callAPI('testTelegram');
+    if (r.sent) {
+      toast('✅ Telegram ส่งสำเร็จ! เช็คมือถือได้เลย ✈️');
+    } else {
+      toast('❌ ส่งไม่ได้: ' + (r.error || 'ตรวจสอบ TELEGRAM_BOT_TOKEN และ TELEGRAM_CHAT_ID'));
+    }
+  } catch(e) { toast('❌ ' + e.message); } finally { unload(); }
 }
+// backward compat (ถ้ายังมี code เก่าเรียก doTestLine)
+const doTestLine = doTestTelegram;
 function saveUrl(){const u=gv('cfgUrl');if(!u)return;localStorage.setItem(VER+'_url',u);APIURL=u;toast('✅ บันทึก URL สำเร็จ');doRefresh();}
 function clearCache(){if(!confirm('ล้าง cache?'))return;localStorage.removeItem(VER+'_d');D={stocks:[],transactions:[],equity:[],dividends:[],prices:{},alerts:[]};renderAll();toast('✅ ล้าง cache แล้ว — กด ↻ Sync');}
 
