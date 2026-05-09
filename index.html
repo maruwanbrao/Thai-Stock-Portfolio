@@ -331,6 +331,7 @@ select option{background:var(--bg2)}
   <button class="nb"     onclick="goPg('txs',this)">📋 ซื้อ–ขาย</button>
   <button class="nb"     onclick="goPg('dca',this)">💰 DCA</button>
   <button class="nb"     onclick="goPg('div',this)">🎯 ปันผล</button>
+  <button class="nb"     onclick="goPg('cash',this)">💵 Cash</button>
   <button class="nb"     onclick="goPg('alert',this)">🔔 แจ้งเตือน</button>
   <button class="nb"     onclick="goPg('crypto',this)">₿ คริปโต</button>
   <button class="nb"     onclick="goPg('ai',this)">🤖 AI</button>
@@ -346,6 +347,12 @@ select option{background:var(--bg2)}
     <div class="kpi kb"><div class="kl">มูลค่าพอร์ต</div><div class="kv" id="kval" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ราคาตลาด</div></div>
     <div class="kpi ky"><div class="kl">ปันผลรวม</div><div class="kv" id="kdiv" style="color:var(--gold)">–</div><div class="ks" style="color:var(--txt3)">ทุกปี</div></div>
     <div class="kpi kg2"><div class="kl">กำไร+ปันผล</div><div class="kv" id="ktot" style="color:var(--jade)">–</div><div class="ks" style="color:var(--txt3)">ผลตอบแทนรวม</div></div>
+    <!-- Cash Balance KPI -->
+    <div class="kpi" style="border-color:rgba(34,197,94,.3);background:linear-gradient(135deg,var(--card),rgba(34,197,94,.05))">
+      <div class="kl">💵 Cash Balance</div>
+      <div class="kv" id="kcash" style="color:#22c55e">–</div>
+      <div class="ks" style="color:var(--txt3)">เงินสดใน Broker</div>
+    </div>
     <div class="kpi kb"><div class="kl">หุ้น/คริปโต</div><div class="kv" id="kcnt" style="color:var(--sky)">–</div><div class="ks" style="color:var(--txt3)">ตัว</div></div>
   </div>
   <div class="sec">สัดส่วนพอร์ต</div>
@@ -402,6 +409,78 @@ select option{background:var(--bg2)}
     <div class="kpi kg2"><div class="kl" title="ปีนี้">ปีนี้</div><div class="kv" id="dvYr" style="color:var(--jade)">–</div></div>
   </div>
   <div class="tw"><table><thead><tr><th>#</th><th>วันที่</th><th>หุ้น</th><th>จำนวน (฿)</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="dvTbl"></tbody></table></div>
+</div>
+
+<!-- CASH BALANCE -->
+<div class="pg" id="pg-cash">
+  <div class="ph">
+    <div>
+      <div class="sec" style="margin:0 0 3px">💵 Cash Balance</div>
+      <div style="font-size:11px;color:var(--txt3)">เงินสดใน Brokerage Account</div>
+    </div>
+    <button class="btn btb" onclick="openCashModal()" style="font-size:12px;padding:7px 12px">+ บันทึกรายการ</button>
+  </div>
+
+  <!-- KPI -->
+  <div class="kg kg-2" style="max-width:500px">
+    <div class="kpi" style="border-color:rgba(34,197,94,.3);background:linear-gradient(135deg,var(--card),rgba(34,197,94,.06))">
+      <div class="kl">ยอดเงินสดปัจจุบัน</div>
+      <div class="kv" id="cashBal" style="color:#22c55e">–</div>
+      <div class="ks" id="cashBalSub" style="color:var(--txt3)">คงเหลือใน Broker</div>
+    </div>
+    <div class="kpi kb">
+      <div class="kl">พอร์ต + Cash รวม</div>
+      <div class="kv" id="cashTotal" style="color:var(--sky)">–</div>
+      <div class="ks" style="color:var(--txt3)">NAV รวมทั้งหมด</div>
+    </div>
+  </div>
+
+  <!-- ตารางประวัติ -->
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>#</th><th>วันที่</th><th>ประเภท</th>
+        <th>จำนวน (฿)</th><th>ยอดคงเหลือ</th><th>หมายเหตุ</th><th></th>
+      </tr></thead>
+      <tbody id="cashTbl"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL: Add Cash -->
+<div class="ov" id="mCash">
+<div class="modal">
+  <div class="mhd">
+    <div class="mttl">💵 บันทึก Cash Balance</div>
+    <button class="mcl" onclick="closeM('mCash')">✕</button>
+  </div>
+  <div class="mbdy">
+    <div class="fg">
+      <label>ประเภทรายการ</label>
+      <select id="fcType">
+        <option value="deposit">💰 โอนเงินเข้า (Deposit)</option>
+        <option value="withdraw">💸 ถอนเงิน / ใช้ซื้อหุ้น (Withdraw)</option>
+        <option value="dividend">🎯 รับปันผล (Dividend)</option>
+        <option value="sell">📈 ขายหุ้น ได้เงิน (Sell)</option>
+        <option value="fee">🏦 ค่าธรรมเนียม (Fee)</option>
+        <option value="other">📝 อื่นๆ (Other)</option>
+      </select>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>วันที่</label><input type="date" id="fcDate"></div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="fcAmt" placeholder="5000" min="0" step="0.01"></div>
+    </div>
+    <div class="fg"><label>หมายเหตุ</label><input type="text" id="fcNote" placeholder="เช่น โอนเงินซื้อ UPOIC"></div>
+    <!-- Preview ยอดหลังบันทึก -->
+    <div style="background:var(--bg2);border:1px solid var(--rim);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:var(--txt2)">
+      ยอดหลังบันทึก: <span id="fcPreview" style="font-family:var(--mono);color:#22c55e;font-weight:700">–</span>
+    </div>
+    <div class="mr">
+      <button class="btn btb" onclick="submitCash()">✅ บันทึก</button>
+      <button class="btn btg" onclick="closeM('mCash')">ยกเลิก</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- ALERTS -->
@@ -673,7 +752,7 @@ let D = (() => {
     return r ? JSON.parse(r) : null;
   } catch(e) {}
   return null;
-})() || { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[] };
+})() || { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[], cash:[], cashBalance:0 };
 
 // บันทึก cache ลง localStorage
 const persist = () => localStorage.setItem(VER+'_d', JSON.stringify(D));
@@ -750,6 +829,8 @@ async function syncData() {
   D.dividends    = data.dividends    || [];
   D.prices       = data.prices       || {};
   D.alerts       = data.alerts       || [];
+  D.cash         = data.cash         || [];
+  D.cashBalance  = data.cashBalance  || 0;
   persist();
 }
 
@@ -821,7 +902,7 @@ const gv=id=>document.getElementById(id)?.value?.trim()||'';
 let eqCI=null;
 function renderAll(){
   renderDash();renderPort();renderTxs();renderDCA();renderDiv();
-  renderAlerts();renderCrypto();renderCfg();fillSymSelects();
+  renderCash();renderAlerts();renderCrypto();renderCfg();fillSymSelects();
 }
 
 function renderDash(){
@@ -832,6 +913,8 @@ function renderDash(){
   document.getElementById('kpnlcard').className='kpi '+(g?'kg2':'kr');
   set('kpnlp','<span style="color:'+(g?'var(--jade)':'var(--rose)')+'">'+( g?'▲':'▼')+' '+f(Math.abs(t.pct))+'%</span>');
   set('kval',fK(t.val)); set('kdiv',fK(t.div)); set('ktot',fK(t.pnl+t.div)); set('kcnt',t.cnt+'');
+  // Cash Balance KPI
+  set('kcash', fK(D.cashBalance||0));
 
   const active=Object.values(m).filter(x=>x.vol>0);
   set('sumTbl',active.map(x=>{const g=x.pnl>=0;return`<tr>
@@ -925,6 +1008,58 @@ function renderDiv(){
     <td style="color:var(--txt3)">${d.note||''}</td>
     <td><button class="db" onclick="delDiv('${d.id}')">✕</button></td>
   </tr>`).join(''));
+}
+
+// ── renderCash ────────────────────────────────
+function renderCash(){
+  const bal  = D.cashBalance || 0;
+  const rows = [...(D.cash||[])].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+  const t    = calcTotals();
+  const nav  = t.val + bal; // NAV = พอร์ต + cash
+
+  // KPI
+  set('cashBal',    fK(bal));
+  set('cashBalSub', rows.length ? 'อัพเดทล่าสุด '+rows[0].date : 'ยังไม่มีรายการ');
+  set('cashTotal',  fK(nav));
+
+  // KPI ใน Dashboard
+  set('kcash', fK(bal));
+
+  // type label map
+  const TYPE_LABEL = {
+    deposit:  '💰 โอนเงินเข้า',
+    withdraw: '💸 ถอน/ซื้อหุ้น',
+    dividend: '🎯 ปันผล',
+    sell:     '📈 ขายหุ้น',
+    fee:      '🏦 ค่าธรรมเนียม',
+    other:    '📝 อื่นๆ',
+  };
+  const TYPE_COLOR = {
+    deposit:  'var(--jade)',
+    dividend: 'var(--jade)',
+    sell:     'var(--jade)',
+    withdraw: 'var(--rose)',
+    fee:      'var(--rose)',
+    other:    'var(--txt2)',
+  };
+  const isPos = t => ['deposit','dividend','sell','other'].includes(t);
+
+  set('cashTbl', rows.length ? rows.map((c,i)=>{
+    const pos = isPos(c.type);
+    const col = TYPE_COLOR[c.type] || 'var(--txt2)';
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${c.date}</td>
+      <td>${TYPE_LABEL[c.type]||c.type}</td>
+      <td style="font-family:var(--mono);color:${col};font-weight:700">
+        ${pos?'+':'-'}${fB(Math.abs(+c.amount))}
+      </td>
+      <td style="font-family:var(--mono);color:#22c55e;font-weight:700">${fB(+c.balance)}</td>
+      <td style="color:var(--txt3);font-size:11.5px">${c.note||''}</td>
+      <td><button class="db" onclick="delCash('${c.id}')">✕</button></td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="7" style="text-align:center;color:var(--txt3);padding:24px">ยังไม่มีรายการ — กด "+ บันทึกรายการ"</td></tr>');
 }
 
 function renderAlerts(){
@@ -1061,6 +1196,57 @@ function openAlertModal(sym){
   document.getElementById('alPrice').value='';
   document.getElementById('alNote').value='';
   openM('mAlert');
+}
+
+// ── Cash Modal ────────────────────────────────
+function openCashModal(){
+  document.getElementById('fcDate').value  = today();
+  document.getElementById('fcAmt').value   = '';
+  document.getElementById('fcNote').value  = '';
+  document.getElementById('fcType').value  = 'deposit';
+  updateCashPreview();
+  openM('mCash');
+}
+
+// live preview ยอดเงินหลังบันทึก
+function updateCashPreview(){
+  const type   = gv('fcType');
+  const amt    = +gv('fcAmt') || 0;
+  const bal    = D.cashBalance || 0;
+  const isPos  = ['deposit','dividend','sell','other'].includes(type);
+  const newBal = isPos ? bal + amt : bal - amt;
+  const col    = newBal >= 0 ? '#22c55e' : 'var(--rose)';
+  set('fcPreview', `<span style="color:${col}">${fB(newBal)}</span>  <span style="font-size:11px;color:var(--txt3)">(ปัจจุบัน ${fB(bal)})</span>`);
+}
+
+async function submitCash(){
+  const type = gv('fcType');
+  const date = gv('fcDate');
+  const amt  = +gv('fcAmt');
+  const note = gv('fcNote');
+  if(!date)         { toast('⚠️ เลือกวันที่'); return; }
+  if(!amt||amt<=0)  { toast('⚠️ ใส่จำนวนเงิน (ต้องมากกว่า 0)'); return; }
+  load('กำลังบันทึก...');
+  try{
+    const r = await callAPI('addCash',{type,date,amount:amt,note});
+    // อัพเดท local cache
+    D.cashBalance = r.balance;
+    D.cash.push({id:r.id, type, date, amount:amt, note, balance:r.balance});
+    persist(); closeM('mCash'); renderCash(); renderDash();
+    const typeLabel = {deposit:'โอนเงินเข้า',withdraw:'ถอนเงิน',dividend:'ปันผล',sell:'ขายหุ้น',fee:'ค่าธรรมเนียม',other:'อื่นๆ'};
+    toast(`✅ บันทึก${typeLabel[type]||type} ฿${f(amt)} | ยอดคงเหลือ ${fB(r.balance)}`);
+  }catch(e){ toast('❌ '+e.message); }finally{ unload(); }
+}
+
+async function delCash(id){
+  if(!confirm('ลบรายการนี้?\n(ยอด Cash Balance จะถูกคำนวณใหม่จาก Apps Script)')) return;
+  load('กำลังลบ...');
+  try{
+    await callAPI('deleteCash',{id});
+    // sync ใหม่เพื่อได้ balance ที่ถูกต้อง
+    await syncData(); renderCash(); renderDash();
+    toast('✅ ลบและคำนวณยอดใหม่แล้ว');
+  }catch(e){ toast('❌ '+e.message); }finally{ unload(); }
 }
 
 // ════════════════════════════════
@@ -1305,6 +1491,13 @@ window.addEventListener('load', () => {
       const v=+(gv('ftVol')||0), p=+(gv('ftPx')||0), fee2=+(gv('ftFee')||0);
       set('ftTotal', '฿' + f(v*p + fee2));
     });
+  });
+
+  // ── live preview ยอด Cash Balance ──
+  ['fcAmt','fcType'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input',  updateCashPreview);
+    if (el) el.addEventListener('change', updateCashPreview);
   });
 
   // ── โหลด Chart.js แล้วเริ่มแอพ ──
