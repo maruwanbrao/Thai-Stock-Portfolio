@@ -1318,7 +1318,7 @@ async function submitAlert(){
     const r=await callAPI('addAlert',{symbol:sym,condition:cond,targetPrice:price,note});
     D.alerts.push({id:r.id,symbol:sym,condition:cond,targetPrice:price,note,active:true,triggeredAt:'',createdAt:new Date().toISOString()});
     persist(); closeM('mAlert'); renderAlerts();
-    toast(`✅ ตั้งเป้า ${sym} ${cond==='above'?'≥':'≤'} ฿${price} — LINE แจ้งเตือนอัตโนมัติ`);
+    toast(`✅ ตั้งเป้า ${sym} ${cond==='above'?'≥':'≤'} ฿${price} — Telegram แจ้งเตือนอัตโนมัติ`);
   }catch(e){toast('❌ '+e.message);}finally{unload();}
 }
 
@@ -1558,7 +1558,7 @@ function saveUrl() {
 function clearCache() {
   if (!confirm('ล้าง cache ใน browser?\n(ข้อมูลใน Google Sheets ยังอยู่ครบ)')) return;
   localStorage.removeItem(VER+'_d');
-  D = { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[] };
+  D = { stocks:[], transactions:[], equity:[], dividends:[], prices:{}, alerts:[], cash:[], cashBalance:0 };
   renderAll();
   toast('✅ ล้าง cache แล้ว — กด ↻ Sync เพื่อโหลดข้อมูลใหม่');
 }
